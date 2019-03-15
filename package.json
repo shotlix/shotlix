@@ -1,8 +1,25 @@
 {
   "name": "u18-game",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "1.0.1",
   "repository": "git@github.com:u18-game-con/u18-game.git",
   "author": "yoshi1125hisa <yoppy1125yoppy@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn scss && yarn autoprefixer",
+    "scss": "node-sass --watch --include-path scss scss -o css --output-style compressed",
+    "prefix": "postcss --use autoprefixer --no-map scss -d css"
+  },
+  "dependencies": {
+    "autoprefixer": "^9.5.0",
+    "node-sass": "^4.11.0",
+    "node-sass-import": "^2.0.1",
+    "postcss": "^7.0.14",
+    "postcss-cli": "^6.1.2"
+  },
+    "browserslist": [
+    "last 2 versions",
+    "not ie < 11",
+    "Android >= 6",
+    "iOS >= 10"
+  ]
 }
