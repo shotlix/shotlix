@@ -1,0 +1,8 @@
+{
+  "name": "u18-game",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:u18-game-con/u18-game.git",
+  "author": "yoshi1125hisa <yoppy1125yoppy@gmail.com>",
+  "license": "MIT"
+}
