@@ -19,7 +19,7 @@ input {
   text-align: center;
 }
 
-.main-container {
+.top-container {
   position: absolute;
   top: 200px;
   width: 100%;
@@ -50,7 +50,7 @@ input {
 
 .background-grid {
   margin-top: -5vw;
-  margin-left: calc(50vw - 49.5vw - 15px);
+  margin-left: calc(50vw - 49.5vw - 15px); // 中央に配置する為の調整
   width: calc(99vw + 60px);
   display: flex;
   flex-wrap: wrap;
