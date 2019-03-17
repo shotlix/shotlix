@@ -1,1 +1,0 @@
-alert("Hello, Phina.js!")
