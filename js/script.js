@@ -4,14 +4,14 @@ const BLOCK_WIDTH = 60;
 const BLOCK_HEIGHT = 60;
 const SCREEN_SIZE = 2400;
 
-var direction_array = ['right', 'up', 'left', 'down'];
+let direction_array = ['right', 'up', 'left', 'down'];
 
-var game_array = [];
-var game_array_element = [];
-for (var i=0; i<SCREEN_SIZE/80; i++) {
+let game_array = [];
+let game_array_element = [];
+for (let i=0; i<SCREEN_SIZE/80; i++) {
   game_array_element.push(0);
 }
-for (var j=0; j<SCREEN_SIZE/80; j++) {
+for (let j=0; j<SCREEN_SIZE/80; j++) {
   game_array.push(game_array_element);
 }
 
@@ -23,25 +23,25 @@ phina.define('MainScene', {
       height: SCREEN_SIZE,
     });
     this.backgroundColor = '#41404B';
-    var blockGroup = DisplayElement().addChildTo(this);
-    var blockGrid = Grid({
+    let blockGroup = DisplayElement().addChildTo(this);
+    let blockGrid = Grid({
       width: SCREEN_SIZE,
       columns: SCREEN_SIZE/80,
       offset: 40
     });
-    for (var i=0; i<SCREEN_SIZE/80; i++) {
-      for (var j=0; j<SCREEN_SIZE/80; j++) {
+    for (let i=0; i<SCREEN_SIZE/80; i++) {
+      for (let j=0; j<SCREEN_SIZE/80; j++) {
         Block("#27262C").addChildTo(blockGroup)
                .setPosition(blockGrid.span(i), blockGrid.span(j))
       }
     }
-    var snake = Snake().addChildTo(this);
+    let snake = Snake().addChildTo(this);
     snake.setPosition(blockGrid.span(snake.livePositionX), blockGrid.span(snake.livePositionY));
     this.snake = snake;
     this.blockGroup = blockGroup;
   },
   update: function(app) { //todo livePosition更新
-    var snake = this.snake;
+    let snake = this.snake;
     snake.moveBy(snake.speedX, snake.speedY);
     this.blockGroup.children.some(function(block) {
       if (snake.x === block.x && snake.y === block.y) {
@@ -81,8 +81,8 @@ phina.define('MainScene', {
         }
       } 
     )
-    var key = app.keyboard;
-    for (var i=0; i<4; i++) {
+    let key = app.keyboard;
+    for (let i=0; i<4; i++) {
       if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
         snake.afterdirection = direction_array[i];
       }
