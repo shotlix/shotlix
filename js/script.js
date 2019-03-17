@@ -1,17 +1,18 @@
 phina.globalize();
 
-const BLOCK_WIDTH = 60;
-const BLOCK_HEIGHT = 60;
-const SCREEN_SIZE = 2400;
+const BLOCK_WIDTH = 60,
+      BLOCK_HEIGHT = 60,
+      SCREEN_SIZE = 2400,
+      screen_per = SCREEN_SIZE/80;
 
-let direction_array = ['right', 'up', 'left', 'down'];
+let direction_array = ['right', 'up', 'left', 'down'],
+    game_array = [],
+    game_array_element = [];
 
-let game_array = [];
-let game_array_element = [];
-for (let i=0; i<SCREEN_SIZE/80; i++) {
+for (let i=0; i<screen_per; i++) {
   game_array_element.push(0);
 }
-for (let j=0; j<SCREEN_SIZE/80; j++) {
+for (let j=0; j<screen_per; j++) {
   game_array.push(game_array_element);
 }
 
@@ -26,11 +27,11 @@ phina.define('MainScene', {
     let blockGroup = DisplayElement().addChildTo(this);
     let blockGrid = Grid({
       width: SCREEN_SIZE,
-      columns: SCREEN_SIZE/80,
+      columns: screen_per,
       offset: 40
     });
-    for (let i=0; i<SCREEN_SIZE/80; i++) {
-      for (let j=0; j<SCREEN_SIZE/80; j++) {
+    for (let i=0; i<screen_per; i++) {
+      for (let j=0; j<screen_per; j++) {
         Block("#27262C").addChildTo(blockGroup)
                .setPosition(blockGrid.span(i), blockGrid.span(j))
       }
