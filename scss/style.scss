@@ -1,0 +1,74 @@
+body {
+  background-color: #41404B;
+  overflow: hidden;
+}
+
+input {
+  font-size: 1.2rem;
+  width: 250px;
+  padding: 13px 0;
+  border-radius: 100px;
+  appearance: none;
+  border: none;
+  outline: none;
+  text-align: center;
+}
+
+.container {
+  position: relative;
+  overflow: hidden;
+}
+
+.top-container {
+  position: absolute;
+  top: 200px;
+  width: 100%;
+  text-align: center;
+  &__ttl {
+    font-family: "Orbitron",sans-serif;
+    font-size: calc(4rem + 2vw);
+    color: white;
+  }
+  &__name {
+    margin: 120px auto 30px auto;
+    display: block;
+    &::placeholder {
+      font-weight: 300;
+      color: #c3c3c3;
+    }
+  }
+  &__submit {
+    cursor: pointer;
+    color: white;
+    transition: 0.3s;
+    background-color: #73DAC1;
+    &:hover {
+      background-color: #07e2a3;
+    }
+  }
+}
+
+.background-grid {
+  margin-top: -5vw;
+  margin-left: calc(50vw - 49.5vw - 15px); // 中央に配置する為の調整
+  width: calc(99vw + 60px);
+  display: flex;
+  flex-wrap: wrap;
+  &__item {
+    margin: 5px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 33vw;
+    height: 33vw;
+  }
+}
+
+
+@media screen and (max-width:599px) {
+  .top-container {
+    top: 100px;
+    &__ttl {
+      font-size: 3rem;
+    }
+  }
+}
