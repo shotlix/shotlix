@@ -1,9 +1,5 @@
-html {
-  overflow: hidden; }
-
 body {
   background-color: #41404B;
-  position: relative;
   overflow: hidden; }
 
 input {
@@ -18,38 +14,42 @@ input {
   outline: none;
   text-align: center; }
 
-.main-container {
+.container {
+  position: relative;
+  overflow: hidden; }
+
+.top-container {
   position: absolute;
   top: 200px;
   width: 100%;
   text-align: center; }
-  .main-container__ttl {
+  .top-container__ttl {
     font-family: "Orbitron",sans-serif;
     font-size: calc(4rem + 2vw);
     color: white; }
-  .main-container__name {
+  .top-container__name {
     margin: 120px auto 30px auto;
     display: block; }
-    .main-container__name::-webkit-input-placeholder {
+    .top-container__name::-webkit-input-placeholder {
       font-weight: 300;
       color: #c3c3c3; }
-    .main-container__name:-ms-input-placeholder {
+    .top-container__name:-ms-input-placeholder {
       font-weight: 300;
       color: #c3c3c3; }
-    .main-container__name::-ms-input-placeholder {
+    .top-container__name::-ms-input-placeholder {
       font-weight: 300;
       color: #c3c3c3; }
-    .main-container__name::placeholder {
+    .top-container__name::placeholder {
       font-weight: 300;
       color: #c3c3c3; }
-  .main-container__submit {
+  .top-container__submit {
     cursor: pointer;
     color: white;
     -webkit-transition: 0.3s;
     -o-transition: 0.3s;
     transition: 0.3s;
     background-color: #73DAC1; }
-    .main-container__submit:hover {
+    .top-container__submit:hover {
       background-color: #07e2a3; }
 
 .background-grid {
@@ -69,7 +69,7 @@ input {
     height: 33vw; }
 
 @media screen and (max-width: 599px) {
-  .main-container {
+  .top-container {
     top: 100px; }
-    .main-container__ttl {
+    .top-container__ttl {
       font-size: 3rem; } }
