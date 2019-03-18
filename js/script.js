@@ -82,7 +82,7 @@ phina.define('MainScene', {
             break;
         }
         if (game_array[snake.livePositionX][snake.livePositionY] === 0) {
-          this.gameover();
+          
         }
         switch (snake.afterdirection) {
           case 'right':
@@ -121,7 +121,7 @@ phina.define('MainScene', {
         }
       } 
     )
-    var key = app.keyboard;
+    let key = app.keyboard;
     for (i=0; i<4; i++) {
       if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
         snake.afterdirection = direction_array[i];
