@@ -81,7 +81,7 @@ phina.define('MainScene', {
             snake.livePositionY += 1;
             break;
         }
-        if (game_array[snake.livePositionX][snake.livePositionY] === 0) {
+        if (game_array[snake.livePositionY][snake.livePositionX] === 0) {
           
         }
         switch (snake.afterdirection) {
@@ -90,7 +90,7 @@ phina.define('MainScene', {
             snake.speedY = 0;
             snake.beforedirection = 'right';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE))/GRID_SIZE] = 1;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
             block.fill = "pink";
             break;
           case 'left':
@@ -98,7 +98,7 @@ phina.define('MainScene', {
             snake.speedY = 0;
             snake.beforedirection = 'left';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE))/GRID_SIZE] = 1;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
             block.fill = "pink";
             break;
           case 'up':
@@ -106,7 +106,7 @@ phina.define('MainScene', {
             snake.speedY = -SNAKE_SPEED;
             snake.beforedirection = 'up';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE))/GRID_SIZE] = 1;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
             block.fill = "pink";
             break;
           case 'down':
@@ -114,7 +114,7 @@ phina.define('MainScene', {
             snake.speedY = SNAKE_SPEED;
             snake.beforedirection = 'down';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE))/GRID_SIZE] = 1;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
             block.fill = "pink";
             break;
           } 
