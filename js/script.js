@@ -1,21 +1,23 @@
 phina.globalize();
 
-const BLOCK_SIZE = 25;
-      SCREEN_WIDTH = 1800;
-      SCREEN_HEIGHT = 960;
-      GRID_SIZE = 30;
-      SNAKE_SPEED = 6;
+const BLOCK_SIZE = 25,
+      SCREEN_WIDTH = 1800,
+      SCREEN_HEIGHT = 960,
+      GRID_SIZE = 30,
+      GRID_NUM_X = SCREEN_WIDTH/GRID_SIZE,
+      GRID_NUM_Y = SCREEN_HEIGHT/GRID_SIZE,
+      SNAKE_SPEED = 6,
       direction_array = ['right', 'up', 'left', 'down'];
 
-let game_array = [];
+let game_array = [],
     game_array_element = [];
-for (let i=0; i<SCREEN_HEIGHT/GRID_SIZE; i++) {
+for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
-  for (let j=0; j<SCREEN_WIDTH/GRID_SIZE; j++) {
-    if (i === 0 || i === SCREEN_HEIGHT/GRID_SIZE-1) {
+  for (let j=0; j<GRID_NUM_X; j++) {
+    if (i === 0 || i === GRID_NUM_Y-1) {
       game_array_element.push(0);
     } else {
-      if (j === 0 || j === SCREEN_WIDTH/GRID_SIZE-1) {
+      if (j === 0 || j === GRID_NUM_X-1) {
         game_array_element.push(0);
       } else {
         game_array_element.push(1);
@@ -36,16 +38,16 @@ phina.define('MainScene', {
     const blockGroup = DisplayElement().addChildTo(this);
     const blockGridX = Grid({
       width: SCREEN_WIDTH,
-      columns: SCREEN_WIDTH/GRID_SIZE,
+      columns: GRID_NUM_X,
       offset: GRID_SIZE/2
     });
     const blockGridY = Grid({
       width: SCREEN_HEIGHT,
-      columns: SCREEN_HEIGHT/GRID_SIZE,
+      columns: GRID_NUM_Y,
       offset: GRID_SIZE/2
     })
-    for (i=0; i<SCREEN_WIDTH/GRID_SIZE; i++) {
-      for (j=0; j<SCREEN_HEIGHT/GRID_SIZE; j++) {
+    for (i=0; i<GRID_NUM_X; i++) {
+      for (j=0; j<GRID_NUM_Y; j++) {
         if (game_array[j][i] === 0) {
           Block("red").addChildTo(blockGroup)
                .setPosition(blockGridX.span(i), blockGridY.span(j)); 
