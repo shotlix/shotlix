@@ -40,12 +40,12 @@ phina.define('MainScene', {
       width: SCREEN_WIDTH,
       columns: GRID_NUM_X,
       offset: GRID_SIZE/2
-    });
-    const blockGridY = Grid({
+    }),
+          blockGridY = Grid({
       width: SCREEN_HEIGHT,
       columns: GRID_NUM_Y,
       offset: GRID_SIZE/2
-    })
+    });
     for (i=0; i<GRID_NUM_X; i++) {
       for (j=0; j<GRID_NUM_Y; j++) {
         if (game_array[j][i] === 0) {
