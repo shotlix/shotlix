@@ -57,13 +57,13 @@ phina.define('MainScene', {
         }
       }
     }
-    let snake = Snake().addChildTo(this);
+    const snake = Snake().addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePositionX), blockGridY.span(snake.livePositionY));
     this.snake = snake;
     this.blockGroup = blockGroup;
   },
   update: function(app) { //todo  赤に衝突で死亡判定 
-    let snake = this.snake;
+    const snake = this.snake;
     snake.moveBy(snake.speedX, snake.speedY);
     this.blockGroup.children.some(function(block) {
       if (snake.x === block.x && snake.y === block.y) {
@@ -121,7 +121,7 @@ phina.define('MainScene', {
         }
       } 
     )
-    let key = app.keyboard;
+    const key = app.keyboard;
     for (i=0; i<4; i++) {
       if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
         snake.afterdirection = direction_array[i];
