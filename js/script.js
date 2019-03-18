@@ -11,6 +11,7 @@ const BLOCK_SIZE = 25,
 
 let game_array = [],
     game_array_element = [];
+
 for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
   for (let j=0; j<GRID_NUM_X; j++) {
@@ -35,7 +36,6 @@ phina.define('MainScene', {
       height: SCREEN_HEIGHT,
     });
     this.backgroundColor = '#41404B';
-    const blockGroup = DisplayElement().addChildTo(this);
     const blockGridX = Grid({
       width: SCREEN_WIDTH,
       columns: GRID_NUM_X,
@@ -46,6 +46,7 @@ phina.define('MainScene', {
       columns: GRID_NUM_Y,
       offset: GRID_SIZE/2
     });
+    const blockGroup = DisplayElement().addChildTo(this);
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
         if (i === 0 || i === GRID_NUM_Y-1) {
@@ -66,6 +67,8 @@ phina.define('MainScene', {
     snake.setPosition(blockGridX.span(snake.livePositionX), blockGridY.span(snake.livePositionY));
     this.snake = snake;
     this.blockGroup = blockGroup;
+    this.blockGridX = blockGridX;
+    this.blockGridY = blockGridY;
   },
   update: function(app) { //todo  赤に衝突で死亡判定 
     const snake = this.snake;
@@ -88,7 +91,9 @@ phina.define('MainScene', {
             break;
         }
         if (game_array[snake.livePositionY][snake.livePositionX] === null) {
-          self.exit();
+          snake.remove();
+          self.revival();
+          return true;
         }
         switch (snake.afterdirection) {
           case 'right':
@@ -133,6 +138,17 @@ phina.define('MainScene', {
         snake.afterdirection = direction_array[i];
       }
     }
+  },
+  revival: function() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const snake = Snake().addChildTo(this);
+        snake.setPosition(this.blockGridX.span(snake.livePositionX),
+                          this.blockGridY.span(snake.livePositionY));
+        this.snake = snake;
+        resolve();
+      }, 1000*5);
+    });
   }
 });
 
