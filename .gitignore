@@ -61,3 +61,6 @@ typings/
 .next
 *.xml
 *.iml
+
+/src/config/firebase.js
+firebase.js
