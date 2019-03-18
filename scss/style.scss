@@ -7,7 +7,7 @@ input {
   font-size: 1.2rem;
   width: 250px;
   padding: 13px 0;
-  border-radius: 100px;
+  border-radius: 10px;
   appearance: none;
   border: none;
   outline: none;
@@ -55,7 +55,7 @@ input {
   display: flex;
   flex-wrap: wrap;
   &__item {
-    margin: 5px;
+    margin: 10px;
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.2);
     width: 33vw;
