@@ -12,6 +12,7 @@ const BLOCK_SIZE = 25,
 let game_array = [],
     game_array_element = [];
 
+//外周がnull,内側が0の二次元配列をgame_arrayに格納する
 for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
   for (let j=0; j<GRID_NUM_X; j++) {
@@ -30,12 +31,14 @@ for (let i=0; i<GRID_NUM_Y; i++) {
 
 phina.define('MainScene', {
   superClass: 'DisplayScene',
+  //初期化処理
   init: function() {
     this.superInit({
       width: SCREEN_WIDTH,
       height: SCREEN_HEIGHT,
     });
     this.backgroundColor = '#41404B';
+    //X方向、Y方向のGridをスクリーン幅に応じて作成
     const blockGridX = Grid({
       width: SCREEN_WIDTH,
       columns: GRID_NUM_X,
@@ -46,6 +49,7 @@ phina.define('MainScene', {
       columns: GRID_NUM_Y,
       offset: GRID_SIZE/2
     });
+    //ブロックを配置する。周りに赤のブロックを置く
     const blockGroup = DisplayElement().addChildTo(this);
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
@@ -63,19 +67,24 @@ phina.define('MainScene', {
         }
       }
     }
+    //ユーザー（snake）を作成
     const snake = Snake().addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePositionX), blockGridY.span(snake.livePositionY));
+    //他の関数からでも参照できるようにする
     this.snake = snake;
     this.blockGroup = blockGroup;
     this.blockGridX = blockGridX;
     this.blockGridY = blockGridY;
   },
-  update: function(app) { //todo  赤に衝突で死亡判定 
+  //毎フレーム実行する処理
+  update: function(app) {
     const snake = this.snake;
     snake.moveBy(snake.speedX, snake.speedY);
     const self = this
     this.blockGroup.children.some(function(block) {
+      //snakeとblockが重なった場合の処理
       if (snake.x === block.x && snake.y === block.y) {
+        //前のブロックから進んだ方向をbeforedirectionで取得し、位置に反映させる
         switch (snake.beforedirection) {
           case 'right':
             snake.livePositionX += 1;
@@ -90,11 +99,13 @@ phina.define('MainScene', {
             snake.livePositionY += 1;
             break;
         }
+        //枠外に出た時の処理
         if (game_array[snake.livePositionY][snake.livePositionX] === null) {
           snake.remove();
           self.revival();
           return true;
         }
+        //次に進む方向による処理,snake自体のスピードを変える
         switch (snake.afterdirection) {
           case 'right':
             snake.speedX = SNAKE_SPEED;
@@ -132,6 +143,7 @@ phina.define('MainScene', {
         }
       } 
     )
+    //ここは毎フレーム行う。押された十字キーがbeforedirectionと反対でないならafterdirectionを更新
     const key = app.keyboard;
     for (i=0; i<4; i++) {
       if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
@@ -139,6 +151,7 @@ phina.define('MainScene', {
       }
     }
   },
+  //死亡時の関数。5秒待って再び復活させる
   revival: function() {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -172,12 +185,12 @@ phina.define('Snake', {
       radius: 10,
       fill: 'black'
     });
-    this.beforedirection = 'right';
-    this.afterdirection = 'right';
+    this.beforedirection = 'right'; //今進んでいる方向
+    this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
     this.speedX = SNAKE_SPEED;
     this.speedY = 0;
-    this.livePositionX = 1;
-    this.livePositionY = 1;
+    this.livePositionX = 1; //今いるX座標(Gridとgame_arrayの位置が対応している)
+    this.livePositionY = 1; //今いるY座標(上と同じ)
   }
 })
 
