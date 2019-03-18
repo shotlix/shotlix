@@ -15,12 +15,12 @@ for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
   for (let j=0; j<GRID_NUM_X; j++) {
     if (i === 0 || i === GRID_NUM_Y-1) {
-      game_array_element.push(0);
+      game_array_element.push(null);
     } else {
       if (j === 0 || j === GRID_NUM_X-1) {
-        game_array_element.push(0);
+        game_array_element.push(null);
       } else {
-        game_array_element.push(1);
+        game_array_element.push(0);
       }
     } 
   }
@@ -46,14 +46,19 @@ phina.define('MainScene', {
       columns: GRID_NUM_Y,
       offset: GRID_SIZE/2
     });
-    for (i=0; i<GRID_NUM_X; i++) {
-      for (j=0; j<GRID_NUM_Y; j++) {
-        if (game_array[j][i] === 0) {
+    for (i=0; i<GRID_NUM_Y; i++) {
+      for (j=0; j<GRID_NUM_X; j++) {
+        if (i === 0 || i === GRID_NUM_Y-1) {
           Block("red").addChildTo(blockGroup)
-               .setPosition(blockGridX.span(i), blockGridY.span(j)); 
+                      .setPosition(blockGridX.span(j), blockGridY.span(i));
         } else {
-          Block("#27262C").addChildTo(blockGroup)
-          .setPosition(blockGridX.span(i), blockGridY.span(j)); 
+          if (j === 0 || j === GRID_NUM_X-1) {
+            Block("red").addChildTo(blockGroup)
+                      .setPosition(blockGridX.span(j), blockGridY.span(i));
+          } else {
+            Block("27269c").addChildTo(blockGroup)
+                      .setPosition(blockGridX.span(j), blockGridY.span(i));
+          }
         }
       }
     }
@@ -65,6 +70,7 @@ phina.define('MainScene', {
   update: function(app) { //todo  赤に衝突で死亡判定 
     const snake = this.snake;
     snake.moveBy(snake.speedX, snake.speedY);
+    const self = this
     this.blockGroup.children.some(function(block) {
       if (snake.x === block.x && snake.y === block.y) {
         switch (snake.beforedirection) {
@@ -81,8 +87,8 @@ phina.define('MainScene', {
             snake.livePositionY += 1;
             break;
         }
-        if (game_array[snake.livePositionY][snake.livePositionX] === 0) {
-          
+        if (game_array[snake.livePositionY][snake.livePositionX] === null) {
+          self.exit();
         }
         switch (snake.afterdirection) {
           case 'right':
@@ -90,7 +96,7 @@ phina.define('MainScene', {
             snake.speedY = 0;
             snake.beforedirection = 'right';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           case 'left':
@@ -98,7 +104,7 @@ phina.define('MainScene', {
             snake.speedY = 0;
             snake.beforedirection = 'left';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           case 'up':
@@ -106,7 +112,7 @@ phina.define('MainScene', {
             snake.speedY = -SNAKE_SPEED;
             snake.beforedirection = 'up';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           case 'down':
@@ -114,7 +120,7 @@ phina.define('MainScene', {
             snake.speedY = SNAKE_SPEED;
             snake.beforedirection = 'down';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 2;
+                      [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           } 
@@ -127,9 +133,6 @@ phina.define('MainScene', {
         snake.afterdirection = direction_array[i];
       }
     }
-  },
-  gameover: function() {
-    
   }
 });
 
