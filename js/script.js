@@ -24,7 +24,7 @@ for (let i=0; i<GRID_NUM_Y; i++) {
       } else {
         game_array_element.push(0);
       }
-    } 
+    }
   }
   game_array.push(game_array_element);
 }
@@ -101,7 +101,11 @@ phina.define('MainScene', {
         }
         //枠外に出た時の処理
         if (game_array[snake.livePositionY][snake.livePositionX] === null) {
-          snake.remove();
+          snake.tweener.clear()
+                       .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
+                       .call(function() {
+                         snake.remove();
+                       })
           self.revival();
           return true;
         }
