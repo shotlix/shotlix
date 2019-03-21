@@ -75,12 +75,35 @@ phina.define('MainScene', {
     this.blockGroup = blockGroup;
     this.blockGridX = blockGridX;
     this.blockGridY = blockGridY;
+    let time = 0;
+    this.time = time;
+    this.label = Label({
+      text: '',
+      fontSize: 100,
+      fill: 'red'
+    }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center());
   },
   //毎フレーム実行する処理
   update: function(app) {
     const snake = this.snake;
     snake.moveBy(snake.speedX, snake.speedY);
-    const self = this
+    if (snake.isDead) {
+      this.time += app.deltaTime;
+      let progressedTime = 5-Math.round(this.time/1000);
+      this.label.text = '復活まであと' + progressedTime + '秒';
+      if (progressedTime === 0) {
+        this.label.remove();
+        let time = 0;
+        this.time = time;
+        this.label = Label({
+          text: '',
+          fontSize: 100,
+          fill: 'red'
+        }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center());
+        snake.isDead = false;
+      }
+    }
+    const self = this;
     this.blockGroup.children.some(function(block) {
       //snakeとblockが重なった場合の処理
       if (snake.x === block.x && snake.y === block.y) {
@@ -101,12 +124,13 @@ phina.define('MainScene', {
         }
         //枠外に出た時の処理
         if (game_array[snake.livePositionY][snake.livePositionX] === null) {
+          snake.isDead = true;
           snake.tweener.clear()
                        .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
                        .call(function() {
                          snake.remove();
-                       })
-          self.revival();
+                         self.revival();
+                       });
           return true;
         }
         //次に進む方向による処理,snake自体のスピードを変える
@@ -164,7 +188,7 @@ phina.define('MainScene', {
                           this.blockGridY.span(snake.livePositionY));
         this.snake = snake;
         resolve();
-      }, 1000*5);
+      }, 1000*4.5);
     });
   }
 });
@@ -195,6 +219,7 @@ phina.define('Snake', {
     this.speedY = 0;
     this.livePositionX = 1; //今いるX座標(Gridとgame_arrayの位置が対応している)
     this.livePositionY = 1; //今いるY座標(上と同じ)
+    this.isDead = false; //死んでいるかどうか
   }
 })
 
