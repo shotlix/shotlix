@@ -7,6 +7,7 @@ const BLOCK_SIZE = 25,
       GRID_NUM_X = SCREEN_WIDTH/GRID_SIZE,
       GRID_NUM_Y = SCREEN_HEIGHT/GRID_SIZE,
       SNAKE_SPEED = 6,
+      BULLET_SPEED = 12,
       direction_array = ['right', 'up', 'left', 'down'];
 
 let game_array = [],
@@ -50,7 +51,8 @@ phina.define('MainScene', {
       offset: GRID_SIZE/2
     });
     //ブロックを配置する。周りに赤のブロックを置く
-    const blockGroup = DisplayElement().addChildTo(this);
+    const blockGroup = DisplayElement().addChildTo(this),
+          bulletGroup = DisplayElement().addChildTo(this);
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
         if (i === 0 || i === GRID_NUM_Y-1) {
@@ -73,10 +75,14 @@ phina.define('MainScene', {
     //他の関数からでも参照できるようにする
     this.snake = snake;
     this.blockGroup = blockGroup;
+    this.bulletGroup = bulletGroup;
     this.blockGridX = blockGridX;
     this.blockGridY = blockGridY;
-    let time = 0;
-    this.time = time;
+    //銃弾のタイマー
+    this.bulletTimer = 0;
+    //死亡時のタイマー
+    let deathTimer = 0;
+    this.deathTimer = deathTimer;
     // ToDo フォントとか変える
     this.label = Label({
       text: '',
@@ -89,13 +95,13 @@ phina.define('MainScene', {
     const snake = this.snake;
     snake.moveBy(snake.speed[0], snake.speed[1]);
     if (snake.isDead) {
-      this.time += app.deltaTime;
-      let progressedTime = 5-Math.round(this.time/1000);
+      this.deathTimer += app.deltaTime;
+      let progressedTime = 5-Math.round(this.deathTimer/1000);
       this.label.text = '復活まであと' + progressedTime + '秒';
       if (progressedTime === 0) {
         this.label.remove();
-        let time = 0;
-        this.time = time;
+        let deathTimer = 0;
+        this.deathTimer = deathTimer;
         this.label = Label({
           text: '',
           fontSize: 100,
@@ -179,12 +185,38 @@ phina.define('MainScene', {
         snake.afterdirection = direction_array[i];
       }
     }
-  },
-  //死亡時の関数。5秒待って再び復活させる
+    //ここから銃弾の処理
+    this.bulletTimer += app.deltaTime;
+    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
+      const bullet = Bullet().addChildTo(this.bulletGroup)
+                            .setPosition(this.blockGridX.span(snake.livePosition[0]),                                 this.blockGridY.span(snake.livePosition[1]));
+      bullet.direction = snake.beforedirection;
+      snake.bullets--;
+      this.bulletTimer = 0;
+    }
+    this.bulletGroup.children.forEach(function(bullet) {
+      switch (bullet.direction) {
+        case 'right':
+          bullet.moveBy(BULLET_SPEED,0);
+          break;
+        case 'up':
+          bullet.moveBy(0, -BULLET_SPEED);
+          break;
+        case 'left':
+          bullet.moveBy(-BULLET_SPEED, 0);
+          break;
+        case 'down':
+          bullet.moveBy(0, BULLET_SPEED);
+          break;
+      }
+    });
+  }, 
+  //死亡時の関数。5秒待って再び復活させる 
   revival: function() {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const snake = Snake().addChildTo(this);
+        snake.bullets = 5;
         snake.setPosition(this.blockGridX.span(snake.livePosition[0]),
                           this.blockGridY.span(snake.livePosition[1]));
         this.snake = snake;
@@ -218,9 +250,24 @@ phina.define('Snake', {
     this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
     this.speed = [SNAKE_SPEED, 0];
     this.livePosition = [1, 1];
-    this.isDead = false; //死んでいるかどうか
+    this.bullets = 10;
+    this.isDead = false;
   }
-})
+});
+
+phina.define('Bullet', {
+  superClass: 'RectangleShape',
+  init: function() {
+    this.superInit({
+      width: 10,
+      height: 10,
+      fill: 'blue',
+      stroke: 'black',
+      strokeWidth: 2
+    });
+    this.direction = '';
+  }
+});
 
 phina.main(function() {
   GameApp({
