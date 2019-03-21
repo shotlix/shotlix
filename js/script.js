@@ -187,6 +187,7 @@ phina.define('MainScene', {
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
+    console.log(this.bulletGroup);
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       const bullet = Bullet().addChildTo(this.bulletGroup)
                             .setPosition(this.blockGridX.span(snake.livePosition[0]),                                 this.blockGridY.span(snake.livePosition[1]));
@@ -208,6 +209,9 @@ phina.define('MainScene', {
         case 'down':
           bullet.moveBy(0, BULLET_SPEED);
           break;
+      }
+      if (bullet.x > SCREEN_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
+        bullet.remove();
       }
     });
   }, 
