@@ -8,7 +8,7 @@ const BLOCK_SIZE = 25,
       GRID_NUM_Y = SCREEN_HEIGHT/GRID_SIZE,
       SNAKE_SPEED = 6,
       SNAKE_SIZE = 10,
-      BULLET_SPEED = 12,
+      BULLET_SPEED = 10,
       BULLET_SIZE = 10;
       direction_array = ['right', 'up', 'left', 'down'];
 
@@ -228,7 +228,7 @@ phina.define('MainScene', {
       if (bullet.x > SCREEN_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
         bullet.remove();
       }
-      if (bullet.x === snake.x && bullet.y === snake.y) {
+      if (Math.abs(snake.x-bullet.x) < SNAKE_SIZE && Math.abs(snake.y-bullet.y) < SNAKE_SIZE) {
         snake.isDead = true;
         snake.tweener.clear()
                      .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
