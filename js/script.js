@@ -69,7 +69,7 @@ phina.define('MainScene', {
     }
     //ユーザー（snake）を作成
     const snake = Snake().addChildTo(this);
-    snake.setPosition(blockGridX.span(snake.livePositionX), blockGridY.span(snake.livePositionY));
+    snake.setPosition(blockGridX.span(snake.livePosition[0]), blockGridY.span(snake.livePosition[1]));
     //他の関数からでも参照できるようにする
     this.snake = snake;
     this.blockGroup = blockGroup;
@@ -77,6 +77,7 @@ phina.define('MainScene', {
     this.blockGridY = blockGridY;
     let time = 0;
     this.time = time;
+    // ToDo フォントとか変える
     this.label = Label({
       text: '',
       fontSize: 100,
@@ -110,20 +111,20 @@ phina.define('MainScene', {
         //前のブロックから進んだ方向をbeforedirectionで取得し、位置に反映させる
         switch (snake.beforedirection) {
           case 'right':
-            snake.livePositionX += 1;
+            snake.livePosition[0] += 1;
             break;
           case 'left':
-            snake.livePositionX -= 1;
+            snake.livePosition[0] -= 1;
             break;
           case 'up':
-            snake.livePositionY -= 1;
+            snake.livePosition[1] -= 1;
             break;
           case 'down':
-            snake.livePositionY += 1;
+            snake.livePosition[1] += 1;
             break;
         }
         //枠外に出た時の処理
-        if (game_array[snake.livePositionY][snake.livePositionX] === null) {
+        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
           snake.isDead = true;
           snake.tweener.clear()
                        .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
@@ -184,8 +185,8 @@ phina.define('MainScene', {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const snake = Snake().addChildTo(this);
-        snake.setPosition(this.blockGridX.span(snake.livePositionX),
-                          this.blockGridY.span(snake.livePositionY));
+        snake.setPosition(this.blockGridX.span(snake.livePosition[0]),
+                          this.blockGridY.span(snake.livePosition[1]));
         this.snake = snake;
         resolve();
       }, 1000*4.5);
@@ -217,8 +218,7 @@ phina.define('Snake', {
     this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
     this.speedX = SNAKE_SPEED;
     this.speedY = 0;
-    this.livePositionX = 1; //今いるX座標(Gridとgame_arrayの位置が対応している)
-    this.livePositionY = 1; //今いるY座標(上と同じ)
+    this.livePosition = [1,1];
     this.isDead = false; //死んでいるかどうか
   }
 })
