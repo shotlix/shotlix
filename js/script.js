@@ -87,7 +87,7 @@ phina.define('MainScene', {
   //毎フレーム実行する処理
   update: function(app) {
     const snake = this.snake;
-    snake.moveBy(snake.speedX, snake.speedY);
+    snake.moveBy(snake.speed[0], snake.speed[1]);
     if (snake.isDead) {
       this.time += app.deltaTime;
       let progressedTime = 5-Math.round(this.time/1000);
@@ -137,32 +137,32 @@ phina.define('MainScene', {
         //次に進む方向による処理,snake自体のスピードを変える
         switch (snake.afterdirection) {
           case 'right':
-            snake.speedX = SNAKE_SPEED;
-            snake.speedY = 0;
+            snake.speed[0] = SNAKE_SPEED;
+            snake.speed[1] = 0;
             snake.beforedirection = 'right';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                       [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           case 'left':
-            snake.speedX = -SNAKE_SPEED;
-            snake.speedY = 0;
+            snake.speed[0] = -SNAKE_SPEED;
+            snake.speed[1] = 0;
             snake.beforedirection = 'left';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                       [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           case 'up':
-            snake.speedX = 0;
-            snake.speedY = -SNAKE_SPEED;
+            snake.speed[0] = 0;
+            snake.speed[1] = -SNAKE_SPEED;
             snake.beforedirection = 'up';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                       [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
             block.fill = "pink";
             break;
           case 'down':
-            snake.speedX = 0;
-            snake.speedY = SNAKE_SPEED;
+            snake.speed[0] = 0;
+            snake.speed[1] = SNAKE_SPEED;
             snake.beforedirection = 'down';
             game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                       [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
@@ -216,9 +216,8 @@ phina.define('Snake', {
     });
     this.beforedirection = 'right'; //今進んでいる方向
     this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
-    this.speedX = SNAKE_SPEED;
-    this.speedY = 0;
-    this.livePosition = [1,1];
+    this.speed = [SNAKE_SPEED, 0];
+    this.livePosition = [1, 1];
     this.isDead = false; //死んでいるかどうか
   }
 })
