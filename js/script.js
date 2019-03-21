@@ -131,13 +131,7 @@ phina.define('MainScene', {
         }
         //枠外に出た時の処理
         if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
-          snake.isDead = true;
-          snake.tweener.clear()
-                       .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
-                       .call(function() {
-                         snake.remove();
-                         self.revival();
-                       });
+          self.revival(snake);
           return true;
         }
         //次に進む方向による処理,snake自体のスピードを変える
@@ -187,7 +181,6 @@ phina.define('MainScene', {
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
-    console.log(this.bulletGroup);
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       const bullet = Bullet().addChildTo(this.bulletGroup)
                             .setPosition(this.blockGridX.span(snake.livePosition[0]),                                 this.blockGridY.span(snake.livePosition[1]));
@@ -195,7 +188,7 @@ phina.define('MainScene', {
       snake.bullets--;
       this.bulletTimer = 0;
     }
-    this.bulletGroup.children.forEach(function(bullet) {
+    this.bulletGroup.children.some(function(bullet) {
       switch (bullet.direction) {
         case 'right':
           bullet.moveBy(BULLET_SPEED,0);
@@ -216,7 +209,13 @@ phina.define('MainScene', {
     });
   }, 
   //死亡時の関数。5秒待って再び復活させる 
-  revival: function() {
+  revival: function(snake) {
+    snake.isDead = true;
+    snake.tweener.clear()
+                 .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
+                 .call(function() {
+                   snake.remove();
+                 });
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const snake = Snake().addChildTo(this);
