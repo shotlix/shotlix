@@ -250,7 +250,7 @@ phina.define('MainScene', {
                           this.blockGridY.span(snake.livePosition[1]));
         this.snake = snake;
         resolve();
-      }, 1000*4.5);
+      }, 4500);
     });
   }
 });
