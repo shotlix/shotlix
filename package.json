@@ -5,7 +5,7 @@
   "author": "yoshi1125hisa <yoppy1125yoppy@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node express",
+    "start": "node app",
     "scss": "node-sass --watch --include-path scss scss -o css --output-style compressed",
     "prefix": "postcss --use autoprefixer --no-map scss -d css",
     "hot-dev-server": "yarn run webpack-dev-server -- --inline --hot"
