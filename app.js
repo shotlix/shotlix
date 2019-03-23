@@ -1,9 +1,10 @@
-let express = require('express');
-let app = express();
-let http = require('http').Server(app);
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const PORT = process.env.PORT || 3000;
 
+app.use(helmet());
 app.use(express.static(__dirname + '/public'));
 
 app.get('/' , function(req, res){
