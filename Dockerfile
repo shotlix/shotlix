@@ -11,5 +11,5 @@ RUN set -x && \
     curl -o- -L https://yarnpkg.com/install.sh | sh && \
     yarn install
 
-# CMD ["yarn", "serve"]
+CMD ["yarn", "start"]
 
