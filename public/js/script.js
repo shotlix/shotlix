@@ -10,10 +10,38 @@ const BLOCK_SIZE = 25,
       SNAKE_SIZE = 10,
       BULLET_SPEED = 10,
       BULLET_SIZE = 10;
-      direction_array = ['right', 'up', 'left', 'down'];
+      direction_array = ['right', 'up', 'left', 'down'],
+      color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
+      MY_COLOR = color_array[Math.floor(Math.random() * color_array.length)],
+      socket = io();
 
 let game_array = [],
     game_array_element = [];
+
+const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+const createSnakeInfo = () => {
+  let handle = direction_array[Math.floor(Math.random()*4)];
+  let speed_array =[];
+  switch (handle) {
+    case 'right':
+      speed_array.push(SNAKE_SPEED);
+      speed_array.push(0);
+      break;
+    case 'up':
+      speed_array.push(0);
+      speed_array.push(-SNAKE_SPEED);
+      break;
+    case 'left':
+      speed_array.push(-SNAKE_SPEED);
+      speed_array.push(0);
+      break;
+    case 'down':
+      speed_array.push(0);
+      speed_array.push(SNAKE_SPEED);
+      break;
+  }
+  return [handle, speed_array[0], speed_array[1]];
+}
 
 //外周がnull,内側が0の二次元配列をgame_arrayに格納する
 for (let i=0; i<GRID_NUM_Y; i++) {
@@ -72,7 +100,8 @@ phina.define('MainScene', {
       }
     }
     //ユーザー（snake）を作成
-    const snake = Snake().addChildTo(this);
+    let [handle, speedX, speedY] = createSnakeInfo();
+    const snake = Snake(handle, speedX, speedY).addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePosition[0]), blockGridY.span(snake.livePosition[1]));
     //他の関数からでも参照できるようにする
     this.snake = snake;
@@ -151,7 +180,7 @@ phina.define('MainScene', {
               snake.beforedirection = 'right';
               game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                         [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = "pink";
+              block.fill = MY_COLOR;
               break;
             case 'left':
               snake.speed[0] = -SNAKE_SPEED;
@@ -159,7 +188,7 @@ phina.define('MainScene', {
               snake.beforedirection = 'left';
               game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                         [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = "pink";
+              block.fill = MY_COLOR;
               break;
             case 'up':
               snake.speed[0] = 0;
@@ -167,7 +196,7 @@ phina.define('MainScene', {
               snake.beforedirection = 'up';
               game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                         [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = "pink";
+              block.fill = MY_COLOR;
               break;
             case 'down':
               snake.speed[0] = 0;
@@ -175,7 +204,7 @@ phina.define('MainScene', {
               snake.beforedirection = 'down';
               game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
                         [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = "pink";
+              block.fill = MY_COLOR;
               break;
             } 
           }
@@ -190,8 +219,8 @@ phina.define('MainScene', {
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
-    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
-      const bullet = Bullet().addChildTo(this.bulletGroup)
+    if (key.getKey('enter') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
+      const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       switch(bullet.direction) {
         case 'right':
@@ -244,7 +273,8 @@ phina.define('MainScene', {
   revival: function(snake) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const snake = Snake().addChildTo(this);
+        let [handle, speedX, speedY] = createSnakeInfo();
+        const snake = Snake(handle, speedX, speedY).addChildTo(this);
         snake.bullets = 5;
         snake.setPosition(this.blockGridX.span(snake.livePosition[0]),
                           this.blockGridY.span(snake.livePosition[1]));
@@ -270,15 +300,15 @@ phina.define('Block', {
 
 phina.define('Snake', {
   superClass: 'CircleShape',
-  init: function() {
+  init: function(handle, speedX, speedY) {
     this.superInit({
       radius: SNAKE_SIZE,
-      fill: 'black'
+      fill: MY_COLOR
     });
-    this.beforedirection = 'right'; //今進んでいる方向
-    this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
-    this.speed = [SNAKE_SPEED, 0];
-    this.livePosition = [1, 1];
+    this.beforedirection = handle; //今進んでいる方向
+    this.afterdirection = handle; //次ブロックと重なった時に進む方向
+    this.speed = [speedX, speedY];
+    this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
     this.isDead = false;
   }
@@ -286,11 +316,11 @@ phina.define('Snake', {
 
 phina.define('Bullet', {
   superClass: 'RectangleShape',
-  init: function() {
+  init: function(color) {
     this.superInit({
       width: BULLET_SIZE,
       height: BULLET_SIZE,
-      fill: 'yellow',
+      fill: color,
       stroke: 'black',
       strokeWidth: 2
     });
