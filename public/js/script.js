@@ -273,7 +273,8 @@ phina.define('MainScene', {
   revival: function(snake) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const snake = Snake(direction_array[Math.floor(Math.random()*4)]).addChildTo(this);
+        let [handle, speedX, speedY] = createSnakeInfo();
+        const snake = Snake(handle, speedX, speedY).addChildTo(this);
         snake.bullets = 5;
         snake.setPosition(this.blockGridX.span(snake.livePosition[0]),
                           this.blockGridY.span(snake.livePosition[1]));
