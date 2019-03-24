@@ -18,6 +18,8 @@ const BLOCK_SIZE = 25,
 let game_array = [],
     game_array_element = [];
 
+const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+
 //外周がnull,内側が0の二次元配列をgame_arrayに格納する
 for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
@@ -194,7 +196,7 @@ phina.define('MainScene', {
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
     if (key.getKey('enter') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
-      const bullet = Bullet().addChildTo(this.bulletGroup)
+      const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       switch(bullet.direction) {
         case 'right':
@@ -281,7 +283,7 @@ phina.define('Snake', {
     this.beforedirection = 'right'; //今進んでいる方向
     this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
     this.speed = [SNAKE_SPEED, 0];
-    this.livePosition = [1, 1];
+    this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
     this.isDead = false;
   }
@@ -289,11 +291,11 @@ phina.define('Snake', {
 
 phina.define('Bullet', {
   superClass: 'RectangleShape',
-  init: function() {
+  init: function(color) {
     this.superInit({
       width: BULLET_SIZE,
       height: BULLET_SIZE,
-      fill: 'yellow',
+      fill: color,
       stroke: 'black',
       strokeWidth: 2
     });
