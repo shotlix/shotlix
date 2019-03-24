@@ -19,6 +19,29 @@ let game_array = [],
     game_array_element = [];
 
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+const createSnakeInfo = () => {
+  let handle = direction_array[Math.floor(Math.random()*4)];
+  let speed_array =[];
+  switch (handle) {
+    case 'right':
+      speed_array.push(SNAKE_SPEED);
+      speed_array.push(0);
+      break;
+    case 'up':
+      speed_array.push(0);
+      speed_array.push(-SNAKE_SPEED);
+      break;
+    case 'left':
+      speed_array.push(-SNAKE_SPEED);
+      speed_array.push(0);
+      break;
+    case 'down':
+      speed_array.push(0);
+      speed_array.push(-SNAKE_SPEED);
+      break;
+  }
+  return [handle, speed_array[0], speed_array[1]];
+}
 
 //外周がnull,内側が0の二次元配列をgame_arrayに格納する
 for (let i=0; i<GRID_NUM_Y; i++) {
@@ -77,7 +100,8 @@ phina.define('MainScene', {
       }
     }
     //ユーザー（snake）を作成
-    const snake = Snake().addChildTo(this);
+    let [handle, speedX, speedY] = createSnakeInfo();
+    const snake = Snake(handle, speedX, speedY).addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePosition[0]), blockGridY.span(snake.livePosition[1]));
     //他の関数からでも参照できるようにする
     this.snake = snake;
@@ -249,7 +273,7 @@ phina.define('MainScene', {
   revival: function(snake) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const snake = Snake().addChildTo(this);
+        const snake = Snake(direction_array[Math.floor(Math.random()*4)]).addChildTo(this);
         snake.bullets = 5;
         snake.setPosition(this.blockGridX.span(snake.livePosition[0]),
                           this.blockGridY.span(snake.livePosition[1]));
@@ -275,14 +299,14 @@ phina.define('Block', {
 
 phina.define('Snake', {
   superClass: 'CircleShape',
-  init: function() {
+  init: function(handle, speedX, speedY) {
     this.superInit({
       radius: SNAKE_SIZE,
       fill: MY_COLOR
     });
-    this.beforedirection = 'right'; //今進んでいる方向
-    this.afterdirection = 'right'; //次ブロックと重なった時に進む方向
-    this.speed = [SNAKE_SPEED, 0];
+    this.beforedirection = handle; //今進んでいる方向
+    this.afterdirection = handle; //次ブロックと重なった時に進む方向
+    this.speed = [speedX, speedY];
     this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
     this.isDead = false;
