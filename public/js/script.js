@@ -37,7 +37,7 @@ const createSnakeInfo = () => {
       break;
     case 'down':
       speed_array.push(0);
-      speed_array.push(-SNAKE_SPEED);
+      speed_array.push(SNAKE_SPEED);
       break;
   }
   return [handle, speed_array[0], speed_array[1]];
