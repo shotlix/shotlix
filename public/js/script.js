@@ -87,6 +87,7 @@ phina.define('MainScene', {
     //ブロックを配置する。周りに赤のブロックを置く
     const blockGroup = DisplayElement().addChildTo(this),
           bulletGroup = DisplayElement().addChildTo(this);
+    let numGroup = DisplayElement().addChildTo(this);
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
         if (i === 0 || i === GRID_NUM_Y-1) {
@@ -129,26 +130,20 @@ phina.define('MainScene', {
       let label = Label({
         text: num,
         fontSize: BLOCK_SIZE-20
-      }).addChildTo(this).setPosition(blockGridX.span(numPositionX), blockGridY.span(numPositionY));
+      }).addChildTo(numGroup).setPosition(blockGridX.span(numPositionX), blockGridY.span(numPositionY));
+      label.num_position_array = [numPositionX, numPositionY];
     }
 
     //他の関数からでも参照できるようにする
     this.snake = snake;
     this.blockGroup = blockGroup;
     this.bulletGroup = bulletGroup;
+    this.numGroup = numGroup;
     this.blockGridX = blockGridX;
     this.blockGridY = blockGridY;
+
     //銃弾のタイマー
-    this.bulletTimer = 0;
-    //死亡時のタイマー
-    let deathTimer = 0;
-    this.deathTimer = deathTimer;
-    // ToDo フォントとか変える
-    this.label = Label({
-      text: '',
-      fontSize: 100,
-      fill: 'red'
-    }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center());
+    this.bulletTimer = 0; 
   },
   //毎フレーム実行する処理
   update: function(app) {
@@ -179,7 +174,7 @@ phina.define('MainScene', {
             snake.livePosition[1] += 1;
             break;
         }
-        //枠外に出た時の処理
+        //game_arrayの値による処理
         if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
           snake.tweener.clear()
                        .scaleTo(0.1, 50)
@@ -187,6 +182,22 @@ phina.define('MainScene', {
                          snake.remove();
                          self.gameover();
                        })
+        } else {
+          snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
+          game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
+          self.numGroup.children.some(function(num) {
+            if (num.num_position_array[0] === snake.livePosition[0] && num.num_position_array[1] === snake.livePosition[1]) {
+              num.tweener.clear()
+                         .to({
+                           scaleX: 0.1,
+                           scaleY: 0.1,
+                           rotation: 360
+                         }, 500)
+                         .call(function() {
+                           num.remove();
+                         });
+            }
+          });
         }
         //次に進む方向による処理,snake自体のスピードを変える
         switch (snake.afterdirection) {
@@ -304,6 +315,7 @@ phina.define('Snake', {
     this.speed = [speedX, speedY];
     this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
+    this.score = 0;
   }
 });
 
