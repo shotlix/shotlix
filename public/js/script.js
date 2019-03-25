@@ -1,22 +1,26 @@
 phina.globalize();
 
-const BLOCK_SIZE = 25,
-      SCREEN_WIDTH = 1800,
-      SCREEN_HEIGHT = 960,
-      GRID_SIZE = 30,
+const BLOCK_SIZE = 60,
+      SCREEN_WIDTH = 2100,
+      SCREEN_HEIGHT = 1050,
+      GRID_SIZE = 70,
       GRID_NUM_X = SCREEN_WIDTH/GRID_SIZE,
       GRID_NUM_Y = SCREEN_HEIGHT/GRID_SIZE,
-      SNAKE_SPEED = 6,
-      SNAKE_SIZE = 10,
+      SNAKE_SPEED = 7,
+      SNAKE_SIZE = 20,
       BULLET_SPEED = 10,
-      BULLET_SIZE = 10;
+      BULLET_SIZE = 10,
+      NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
+      NUM_STRICT = 5, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
       color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
-      MY_COLOR = color_array[Math.floor(Math.random() * color_array.length)],
-      socket = io();
+      MY_COLOR = color_array[Math.floor(Math.random() * color_array.length)];
 
-let game_array = [],
-    game_array_element = [];
+let game_array = [], // フィールドの二次元配列
+    game_array_element = [],
+    num_position_array = [], // 数字の位置の二次元配列
+    time = 0,
+    before_event_time = 0;
 
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 const createSnakeInfo = () => {
@@ -86,23 +90,48 @@ phina.define('MainScene', {
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
         if (i === 0 || i === GRID_NUM_Y-1) {
-          Block("red").addChildTo(blockGroup)
+          Block("transparent").addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
         } else {
           if (j === 0 || j === GRID_NUM_X-1) {
-            Block("red").addChildTo(blockGroup)
+            Block("transparent").addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           } else {
-            Block("27269c").addChildTo(blockGroup)
+            Block("#D5D5D7").addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           }
         }
       }
     }
+
     //ユーザー（snake）を作成
     let [handle, speedX, speedY] = createSnakeInfo();
     const snake = Snake(handle, speedX, speedY).addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePosition[0]), blockGridY.span(snake.livePosition[1]));
+
+    //数字を作成
+    let canWrite = true;
+    for (i=0; i<NUM_STRICT; i++) {
+      let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
+      for (j=0; j<num_position_array.length; j++) {
+        if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
+          i -= 1;
+          canWrite = false;
+        } 
+      }
+      if (!canWrite) {
+        canWrite = true;
+        continue;
+      } 
+      num_position_array.push([numPositionX, numPositionY]);
+      let num = randRange(1,99);
+      game_array[numPositionY][numPositionX] = num;
+      let label = Label({
+        text: num,
+        fontSize: BLOCK_SIZE-20
+      }).addChildTo(this).setPosition(blockGridX.span(numPositionX), blockGridY.span(numPositionY));
+    }
+
     //他の関数からでも参照できるようにする
     this.snake = snake;
     this.blockGroup = blockGroup;
@@ -123,103 +152,78 @@ phina.define('MainScene', {
   },
   //毎フレーム実行する処理
   update: function(app) {
+    time += app.deltaTime;
+    if (time - before_event_time > NUM_EVENT_RANGE) {
+      before_event_time = time;
+      
+    }
     const snake = this.snake;
     const key = app.keyboard;
     const self = this;
     snake.moveBy(snake.speed[0], snake.speed[1]);
-    if (snake.isDead) {
-      this.deathTimer += app.deltaTime;
-      let progressedTime = 5-Math.round(this.deathTimer/1000);
-      this.label.text = '復活まであと' + progressedTime + '秒';
-      if (progressedTime === 0) {
-        this.label.remove();
-        let deathTimer = 0;
-        this.deathTimer = deathTimer;
-        this.label = Label({
-          text: '',
-          fontSize: 100,
-          fill: 'red'
-        }).addChildTo(this).setPosition(this.gridX.center(), this.gridY.center());
-        snake.isDead = false;
-      }
-    } else {
-      this.blockGroup.children.some(function(block) {
-        //snakeとblockが重なった場合の処理
-        if (snake.x === block.x && snake.y === block.y) {
-          //前のブロックから進んだ方向をbeforedirectionで取得し、位置に反映させる
-          switch (snake.beforedirection) {
-            case 'right':
-              snake.livePosition[0] += 1;
-              break;
-            case 'left':
-              snake.livePosition[0] -= 1;
-              break;
-            case 'up':
-              snake.livePosition[1] -= 1;
-              break;
-            case 'down':
-              snake.livePosition[1] += 1;
-              break;
-          }
-          //枠外に出た時の処理
-          if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
-            snake.isDead = true;
-            snake.tweener.clear()
-                         .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
-                         .call(function() {
-                           snake.remove();
-                           self.revival();
-                         });
-            return true;
-          }
-          //次に進む方向による処理,snake自体のスピードを変える
-          switch (snake.afterdirection) {
-            case 'right':
-              snake.speed[0] = SNAKE_SPEED;
-              snake.speed[1] = 0;
-              snake.beforedirection = 'right';
-              game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                        [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = MY_COLOR;
-              break;
-            case 'left':
-              snake.speed[0] = -SNAKE_SPEED;
-              snake.speed[1] = 0;
-              snake.beforedirection = 'left';
-              game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                        [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = MY_COLOR;
-              break;
-            case 'up':
-              snake.speed[0] = 0;
-              snake.speed[1] = -SNAKE_SPEED;
-              snake.beforedirection = 'up';
-              game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                        [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = MY_COLOR;
-              break;
-            case 'down':
-              snake.speed[0] = 0;
-              snake.speed[1] = SNAKE_SPEED;
-              snake.beforedirection = 'down';
-              game_array[(block.y-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] 
-                        [(block.x-BLOCK_SIZE/2-(GRID_SIZE-BLOCK_SIZE)/2)/GRID_SIZE] = 1;
-              block.fill = MY_COLOR;
-              break;
-            } 
-          }
-        } 
-      )
-      //ここは毎フレーム行う。押された十字キーがbeforedirectionと反対でないならafterdirectionを更新
-      for (i=0; i<4; i++) {
-        if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
-          snake.afterdirection = direction_array[i];
+    this.blockGroup.children.some(function(block) {
+      //snakeとblockが重なった場合の処理
+      if (snake.x === block.x && snake.y === block.y) {
+        //前のブロックから進んだ方向をbeforedirectionで取得し、位置に反映させる
+        switch (snake.beforedirection) {
+          case 'right':
+            snake.livePosition[0] += 1;
+            break;
+          case 'left':
+            snake.livePosition[0] -= 1;
+            break;
+          case 'up':
+            snake.livePosition[1] -= 1;
+            break;
+          case 'down':
+            snake.livePosition[1] += 1;
+            break;
         }
+        //枠外に出た時の処理
+        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
+          snake.tweener.clear()
+                       .scaleTo(0.1, 50)
+                       .call(function() {
+                         snake.remove();
+                         self.gameover();
+                       })
+          return true;
+        }
+        //次に進む方向による処理,snake自体のスピードを変える
+        switch (snake.afterdirection) {
+          case 'right':
+            snake.speed[0] = SNAKE_SPEED;
+            snake.speed[1] = 0;
+            snake.beforedirection = 'right';
+            break;
+          case 'left':
+            snake.speed[0] = -SNAKE_SPEED;
+            snake.speed[1] = 0;
+            snake.beforedirection = 'left';
+            break;
+          case 'up':
+            snake.speed[0] = 0;
+            snake.speed[1] = -SNAKE_SPEED;
+            snake.beforedirection = 'up';
+            break;
+          case 'down':
+            snake.speed[0] = 0;
+            snake.speed[1] = SNAKE_SPEED;
+            snake.beforedirection = 'down';
+            break;
+          } 
+        }
+      } 
+    )
+    //ここは毎フレーム行う。押された十字キーがbeforedirectionと反対でないならafterdirectionを更新
+    for (i=0; i<4; i++) {
+      if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
+        snake.afterdirection = direction_array[i];
       }
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
-    if (key.getKey('enter') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
+    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       switch(bullet.direction) {
@@ -257,31 +261,22 @@ phina.define('MainScene', {
       if (bullet.x > SCREEN_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
         bullet.remove();
       }
-      if (Math.abs(snake.x-bullet.x) < SNAKE_SIZE && Math.abs(snake.y-bullet.y) < SNAKE_SIZE) {
-        snake.isDead = true;
-        snake.tweener.clear()
-                     .to({ scaleX: 0.1, scaleY: 0.1 }, 50)
-                     .call(function() {
-                       snake.remove();
-                       self.revival();
-                     });
-        return true;
-      }
     });
   }, 
-  //死亡時の関数。5秒待って再び復活させる 
-  revival: function(snake) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        let [handle, speedX, speedY] = createSnakeInfo();
-        const snake = Snake(handle, speedX, speedY).addChildTo(this);
-        snake.bullets = 5;
-        snake.setPosition(this.blockGridX.span(snake.livePosition[0]),
-                          this.blockGridY.span(snake.livePosition[1]));
-        this.snake = snake;
-        resolve();
-      }, 4500);
-    });
+  gameover: function() {
+    const self = this;
+    var label = Label({
+      text: 'GAME OVER',
+      fill: 'yellow',
+      fontSize: 64,
+    }).addChildTo(this);
+    label.setPosition(this.gridX.center(), this.gridY.center());
+    // 少し待ってからタイトル画面へ
+    label.tweener.clear()
+                 .wait(5000)
+                 .call(function() {
+                   location.href = "/";
+                 });
   }
 });
 
