@@ -187,7 +187,6 @@ phina.define('MainScene', {
                          snake.remove();
                          self.gameover();
                        })
-          return true;
         }
         //次に進む方向による処理,snake自体のスピードを変える
         switch (snake.afterdirection) {
@@ -223,7 +222,7 @@ phina.define('MainScene', {
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
-    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
+    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500) {
       const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       switch(bullet.direction) {
@@ -305,7 +304,6 @@ phina.define('Snake', {
     this.speed = [speedX, speedY];
     this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
-    this.isDead = false;
   }
 });
 
