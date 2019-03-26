@@ -185,7 +185,7 @@ phina.define('MainScene', {
                          .call(function() {
                            setTimeout(function() {
                              self.makeNum(1);
-                           }, 2000);
+                           }, NUM_EVENT_RANGE);
                            num.remove();
                          })
             }
