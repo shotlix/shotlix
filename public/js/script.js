@@ -11,6 +11,7 @@ const BLOCK_SIZE = 60,
       BULLET_SPEED = 10,
       BULLET_SIZE = 10,
       NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
+      ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
       NUM_STRICT = 5, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
       color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
@@ -19,10 +20,12 @@ const BLOCK_SIZE = 60,
 let game_array = [], // フィールドの二次元配列
     game_array_element = [],
     num_position_array = [], // 数字の位置の二次元配列
-    time = 0,
+    time = 0, // 全体のタイマー
+    rod_start_position = [], //邪魔する棒を出すときの位置を格納する
     canNumWrite = true,
-    before_event_time = 0;
+    before_rod_event_time = 0; //
 
+//よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 const createSnakeInfo = () => {
   let handle = direction_array[Math.floor(Math.random()*4)];
@@ -92,14 +95,14 @@ phina.define('MainScene', {
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
         if (i === 0 || i === GRID_NUM_Y-1) {
-          Block("transparent").addChildTo(blockGroup)
+          Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
         } else {
           if (j === 0 || j === GRID_NUM_X-1) {
-            Block("transparent").addChildTo(blockGroup)
+            Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           } else {
-            Block("#D5D5D7").addChildTo(blockGroup)
+            Block("#D5D5D7", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           }
         }
@@ -135,14 +138,56 @@ phina.define('MainScene', {
   },
   //毎フレーム実行する処理
   update: function(app) {
+    const self = this;
     time += app.deltaTime;
-    if (time - before_event_time > NUM_EVENT_RANGE) {
-      before_event_time = time;
-      
+    if (time-before_rod_event_time > ROD_EVENT_RANGE) {
+      if (time % 2 === 0) {
+        rod_start_position = [0, randRange(1, GRID_NUM_Y-2)];
+      } else {
+        rod_start_position = [randRange(1, GRID_NUM_X-2), 0];
+      }
+      switch (rod_start_position[0]) {
+        case 0:
+          let adviceLeftCircle = AdviceCircle().addChildTo(this)
+                                               .setPosition(this.blockGridX.span(rod_start_position[0]),
+                                                            this.blockGridY.span(rod_start_position[1]));
+          let adviceRightCircle = AdviceCircle().addChildTo(this)
+                                                .setPosition(this.blockGridX.span(GRID_NUM_X-1),
+                                                             this.blockGridY.span(rod_start_position[1]));
+          this.flash(adviceLeftCircle);
+          this.flash(adviceRightCircle);
+          setTimeout(function() {
+            self.blockGroup.children.some(function(block) {
+              if (block.blockPosition[1] === rod_start_position[1] && block.blockPosition[0] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1) {
+                game_array[rod_start_position[1]][block.blockPosition[0]] = -1;
+                block.fill = "red";
+              }
+            });
+          }, 3000);
+          break;
+        default:
+          let adviceOverCircle = AdviceCircle().addChildTo(this)
+                                               .setPosition(this.blockGridX.span(rod_start_position[0]),
+                                                            this.blockGridY.span(rod_start_position[1]));
+          let adviceUnderCircle = AdviceCircle().addChildTo(this)
+                                                .setPosition(this.blockGridX.span(rod_start_position[0]),
+                                                             this.blockGridY.span(GRID_NUM_Y-1));
+          this.flash(adviceOverCircle);
+          this.flash(adviceUnderCircle);
+          setTimeout(function() {
+            self.blockGroup.children.some(function(block) {
+              if (block.blockPosition[0] === rod_start_position[0] && block.blockPosition[1] !== 0 && block.blockPosition[1] !== GRID_NUM_Y-1) {
+                game_array[block.blockPosition[1]][rod_start_position[0]] = -1;
+                block.fill = "red";
+              }
+            });
+          }, 3000);
+          break;
+      }
+      before_rod_event_time = time;
     }
     const snake = this.snake;
     const key = app.keyboard;
-    const self = this;
     snake.moveBy(snake.speed[0], snake.speed[1]);
     this.blockGroup.children.some(function(block) {
       //snakeとblockが重なった場合の処理
@@ -164,12 +209,11 @@ phina.define('MainScene', {
         }
         //game_arrayの値による処理
         if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
-          snake.tweener.clear()
-                       .scaleTo(0.1, 50)
-                       .call(function() {
-                         snake.remove();
-                         self.gameover();
-                       })
+          self.killSnake(snake);
+          self.gameover();
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === -1) {
+          self.killSnake(snake);
+          self.gameover();
         } else {
           snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
           self.scoreLabel.text = snake.score + "点";
@@ -225,7 +269,7 @@ phina.define('MainScene', {
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
-    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500) {
+    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && snake) {
       const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       switch(bullet.direction) {
@@ -277,7 +321,7 @@ phina.define('MainScene', {
     label.tweener.clear()
                  .wait(5000)
                  .call(function() {
-                   location.href = "/";
+                   //location.href = "/";
                  });
   },
   makeNum: function(count) {
@@ -302,12 +346,42 @@ phina.define('MainScene', {
       }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
       label.num_position_array = [numPositionX, numPositionY];
       }
+  },
+  flash: function(object) {
+    object.tweener.clear()
+                  .wait(500)
+                  .call(function() {
+                    object.fill = "transparent";
+                  })
+                  .wait(500)
+                  .call(function() {
+                    object.fill = "red";
+                  })
+                  .wait(500)
+                  .call(function() {
+                    object.fill = "transparent";
+                  })
+                  .wait(500)
+                  .call(function() {
+                    object.fill = "red";
+                  })
+                  .wait(500)
+                  .call(function() {
+                    object.remove();
+                  });
+  },
+  killSnake: function(snake) {
+    snake.tweener.clear()
+                       .scaleTo(0.1, 50)
+                       .call(function() {
+                         snake.remove();
+                       })
   }
 });
 
 phina.define('Block', {
   superClass: 'RectangleShape',
-  init: function(color) {
+  init: function(color, blockPositionX, blockPositionY) {
     this.superInit({
       width: BLOCK_SIZE,
       height: BLOCK_SIZE,
@@ -315,8 +389,20 @@ phina.define('Block', {
       strokeWidth: 0,
       cornerRadius: 7
     });
+    this.blockPosition = [blockPositionX, blockPositionY];
   }
 });
+
+phina.define('AdviceCircle', {
+  superClass: 'CircleShape',
+  init: function() {
+    this.superInit({
+      radius: BLOCK_SIZE/4,
+      fill: "red",
+      strokeWidth: 0
+    })
+  }
+})
 
 phina.define('Snake', {
   superClass: 'CircleShape',
