@@ -20,6 +20,7 @@ let game_array = [], // フィールドの二次元配列
     game_array_element = [],
     num_position_array = [], // 数字の位置の二次元配列
     time = 0,
+    canNumWrite = true,
     before_event_time = 0;
 
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -105,34 +106,18 @@ phina.define('MainScene', {
       }
     }
 
+    //点数表示
+    let scoreLabel = Label({
+      text: 0 + "点",
+      fontSize: 50,
+      fill: "red"
+    }).addChildTo(this).setPosition(100,50);
+    this.scoreLabel = scoreLabel
+
     //ユーザー（snake）を作成
     let [handle, speedX, speedY] = createSnakeInfo();
     const snake = Snake(handle, speedX, speedY).addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePosition[0]), blockGridY.span(snake.livePosition[1]));
-
-    //数字を作成
-    let canWrite = true;
-    for (i=0; i<NUM_STRICT; i++) {
-      let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
-      for (j=0; j<num_position_array.length; j++) {
-        if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
-          i -= 1;
-          canWrite = false;
-        } 
-      }
-      if (!canWrite) {
-        canWrite = true;
-        continue;
-      } 
-      num_position_array.push([numPositionX, numPositionY]);
-      let num = randRange(1,99);
-      game_array[numPositionY][numPositionX] = num;
-      let label = Label({
-        text: num,
-        fontSize: BLOCK_SIZE-20
-      }).addChildTo(numGroup).setPosition(blockGridX.span(numPositionX), blockGridY.span(numPositionY));
-      label.num_position_array = [numPositionX, numPositionY];
-    }
 
     //他の関数からでも参照できるようにする
     this.snake = snake;
@@ -141,6 +126,9 @@ phina.define('MainScene', {
     this.numGroup = numGroup;
     this.blockGridX = blockGridX;
     this.blockGridY = blockGridY;
+
+    //数字を作成
+    this.makeNum(5);
 
     //銃弾のタイマー
     this.bulletTimer = 0; 
@@ -184,6 +172,7 @@ phina.define('MainScene', {
                        })
         } else {
           snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
+          self.scoreLabel.text = snake.score + "点";
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
           self.numGroup.children.some(function(num) {
             if (num.num_position_array[0] === snake.livePosition[0] && num.num_position_array[1] === snake.livePosition[1]) {
@@ -194,8 +183,11 @@ phina.define('MainScene', {
                            rotation: 360
                          }, 500)
                          .call(function() {
+                           setTimeout(function() {
+                             self.makeNum(1);
+                           }, 2000);
                            num.remove();
-                         });
+                         })
             }
           });
         }
@@ -287,6 +279,29 @@ phina.define('MainScene', {
                  .call(function() {
                    location.href = "/";
                  });
+  },
+  makeNum: function(count) {
+    for (i=0; i<count; i++) {
+      let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
+      for (j=0; j<num_position_array.length; j++) {
+        if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
+          i -= 1;
+          canNumWrite = false;
+        } 
+      }
+      if (!canNumWrite) {
+        canNumWrite = true;
+        continue;
+      } 
+      num_position_array.push([numPositionX, numPositionY]);
+      let num = randRange(1,99);
+      game_array[numPositionY][numPositionX] = num;
+      let label = Label({
+        text: num,
+        fontSize: BLOCK_SIZE-20
+      }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
+      label.num_position_array = [numPositionX, numPositionY];
+      }
   }
 });
 
