@@ -428,7 +428,7 @@ phina.define('MainScene', {
       let label = Label({
         text: num,
         fontSize: BLOCK_SIZE-30,
-        fontFamily: "Orbitron"
+        fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
       }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
       label.num_position_array = [numPositionX, numPositionY];
       }
