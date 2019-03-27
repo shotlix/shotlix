@@ -1,22 +1,25 @@
 phina.globalize();
 
-const BLOCK_SIZE = 60,
-      SCREEN_WIDTH = 2100,
-      SCREEN_HEIGHT = 1050,
-      GRID_SIZE = 70,
+const BLOCK_SIZE = 55,
+      SCREEN_WIDTH = 1740,
+      SCREEN_HEIGHT = 960,
+      GRID_SIZE = 60,
       GRID_NUM_X = SCREEN_WIDTH/GRID_SIZE,
       GRID_NUM_Y = SCREEN_HEIGHT/GRID_SIZE,
-      SNAKE_SPEED = 7,
+      SNAKE_SPEED = 6,
       SNAKE_SIZE = 20,
       BULLET_SPEED = 10,
       BULLET_SIZE = 10,
       NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
       ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
       BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの感覚
-      NUM_STRICT = 5, // 一度に出る数字の個数
+      NUM_STRICT = 10, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
-      color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
-      MY_COLOR = color_array[Math.floor(Math.random() * color_array.length)];
+      my_color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
+      MY_COLOR = my_color_array[Math.floor(Math.random() * my_color_array.length)],
+      background_color_array = ['#FFB29A', '#ACC3FF', '#A1CA93'],
+      BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)];
+      BLOCK_COLOR = '#FF7394'
 
 let game_array = [], // フィールドの二次元配列
     game_array_element = [],
@@ -78,6 +81,7 @@ const ASSETS = {
   sound: {
     'getBullet': './assets/sounds/getBullet.mp3',
     'shotBullet': './assets/sounds/shotBullet.mp3',
+    'dead': './assets/sounds/dead.mp3',
     'getNum': './assets/sounds/getNum.mp3',
     'alert': './assets/sounds/alert.mp3',
     'rodEvent': './assets/sounds/rodEvent.mp3',
@@ -87,12 +91,9 @@ const ASSETS = {
 phina.define('MainScene', {
   superClass: 'DisplayScene',
   //初期化処理
-  init: function() {
-    this.superInit({
-      width: SCREEN_WIDTH,
-      height: SCREEN_HEIGHT,
-    });
-    this.backgroundColor = '#41404B';
+  init: function(options) {
+    this.superInit(options);
+    this.backgroundColor = BACKGROUND_COLOR;
     //X方向、Y方向のGridをスクリーン幅に応じて作成
     const blockGridX = Grid({
       width: SCREEN_WIDTH,
@@ -110,7 +111,7 @@ phina.define('MainScene', {
     let numGroup = DisplayElement().addChildTo(this);
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
-        if (i === 0 || i === GRID_NUM_Y-1) {
+        if (i === 0 || i === GRID_NUM_Y-1 || i === 1) {
           Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
         } else {
@@ -118,7 +119,7 @@ phina.define('MainScene', {
             Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           } else {
-            Block("#D5D5D7", j, i).addChildTo(blockGroup)
+            Block("white", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           }
         }
@@ -129,7 +130,7 @@ phina.define('MainScene', {
     let scoreLabel = Label({
       text: 0 + "点",
       fontSize: 50,
-      fill: "red"
+      fill: BLOCK_COLOR
     }).addChildTo(this).setPosition(blockGridX.span(1), 25);
     this.scoreLabel = scoreLabel;
 
@@ -137,7 +138,7 @@ phina.define('MainScene', {
     let bulletLabel = Label({
       text: "残り30弾",
       fontSize: 50,
-      fill: "red"
+      fill: BLOCK_COLOR
     }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 25);
     this.bulletLabel = bulletLabel;
 
@@ -155,7 +156,7 @@ phina.define('MainScene', {
     this.blockGridY = blockGridY;
 
     //数字を作成
-    this.makeNum(5);
+    this.makeNum(NUM_STRICT);
     const self = this;
     setTimeout(function() {
       self.makeBulletItem();
@@ -191,7 +192,7 @@ phina.define('MainScene', {
                 if (game_array[rod_start_position[1]][block.blockPosition[0]] === 0 && game_array[rod_start_position[1]][block.blockPosition[0]] !== 100) {
                   game_array[rod_start_position[1]][block.blockPosition[0]] = -1;
                 }
-                block.fill = "red";
+                block.fill = BLOCK_COLOR;
               }
             });
             SoundManager.play("rodEvent");
@@ -212,7 +213,7 @@ phina.define('MainScene', {
                 if (game_array[block.blockPosition[1]][rod_start_position[0]] === 0 && game_array[block.blockPosition[1]][rod_start_position[0]] !== 100) {
                   game_array[block.blockPosition[1]][rod_start_position[0]] = -1;
                 }
-                block.fill = "red";
+                block.fill = BLOCK_COLOR;
               }
             });
             SoundManager.play("rodEvent");
@@ -243,7 +244,10 @@ phina.define('MainScene', {
             break;
         }
         //場外に出た時
-        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null || block.fill === "red") {
+        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null || block.fill === BLOCK_COLOR) {
+          if (!snake.isDead) {
+            SoundManager.play('dead');
+          }
           self.killSnake(snake);
           self.gameover();
         } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100 && !snake.isDead) {
@@ -348,11 +352,11 @@ phina.define('MainScene', {
       self.blockGroup.children.some(function(block) {
         if (Math.abs(bullet.x-block.x) < BLOCK_SIZE/4*3 && Math.abs(bullet.y-block.y) < BLOCK_SIZE/4*3 && 
             block.blockPosition[0] !== 0 && block.blockPosition[1] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1 && block.blockPosition[1] !== GRID_NUM_Y-1 &&
-            block.fill === "red") {
+            block.fill === BLOCK_COLOR) {
           if (game_array[block.blockPosition[1]][block.blockPosition[0]] === -1) {
             game_array[block.blockPosition[1]][block.blockPosition[0]] = 0;
           }
-          block.fill = "#D5D5D7";
+          block.fill = "white";
         }
       })
       if (bullet.x > SCREEN_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
@@ -404,7 +408,7 @@ phina.define('MainScene', {
   flash: function(object) {
     object.tweener.clear()
                   .call(function() {
-                    object.fill = "red";
+                    object.fill = BLOCK_COLOR;
                     SoundManager.play("alert");
                   })
                   .wait(500)
@@ -413,7 +417,7 @@ phina.define('MainScene', {
                   })
                   .wait(500)
                   .call(function() {
-                    object.fill = "red";
+                    object.fill = BLOCK_COLOR;
                     SoundManager.play("alert");
                   })
                   .wait(500)
@@ -422,7 +426,7 @@ phina.define('MainScene', {
                   })
                   .wait(500)
                   .call(function() {
-                    object.fill = "red";
+                    object.fill = BLOCK_COLOR;
                     SoundManager.play("alert");
                   })
                   .wait(500)
@@ -505,8 +509,8 @@ phina.define('Bullet', {
       width: BULLET_SIZE,
       height: BULLET_SIZE,
       fill: color,
-      stroke: 'black',
-      strokeWidth: 2
+      strokeWidth: 2,
+      stroke: "black"
     });
     this.direction = '';
   }
@@ -515,7 +519,7 @@ phina.define('Bullet', {
 phina.main(function() {
   GameApp({
     startLabel: 'main',
-    width: SCREEN_WIDTH,
+    width: 1760,
     height: SCREEN_HEIGHT,
     assets: ASSETS
   }).run();
