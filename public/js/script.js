@@ -70,6 +70,20 @@ for (let i=0; i<GRID_NUM_Y; i++) {
   game_array.push(game_array_element);
 }
 
+//ASSET定義
+const ASSETS = {
+  image: {
+    'bulletItem': './assets/images/bulletItem.png',
+  },
+  sound: {
+    'getBullet': './assets/sounds/getBullet.mp3',
+    'shotBullet': './assets/sounds/shotBullet.mp3',
+    'getNum': './assets/sounds/getNum.mp3',
+    'alert': './assets/sounds/alert.mp3',
+    'rodEvent': './assets/sounds/rodEvent.mp3',
+  },
+};
+
 phina.define('MainScene', {
   superClass: 'DisplayScene',
   //初期化処理
@@ -180,6 +194,7 @@ phina.define('MainScene', {
                 block.fill = "red";
               }
             });
+            SoundManager.play("rodEvent");
           }, 3000);
           break;
         default:
@@ -198,6 +213,7 @@ phina.define('MainScene', {
                 block.fill = "red";
               }
             });
+            SoundManager.play("rodEvent");
           }, 3000);
           break;
       }
@@ -229,6 +245,7 @@ phina.define('MainScene', {
           self.killSnake(snake);
           self.gameover();
         } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100) {
+          SoundManager.play('getBullet');
           snake.bullets += 10;
           self.bulletLabel.text = "残り" + snake.bullets + "弾";
           self.bulletItem.tweener.clear()
@@ -245,9 +262,12 @@ phina.define('MainScene', {
                                  });
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
         } else {
-          snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
-          self.scoreLabel.text = snake.score + "点";
-          game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
+          if (game_array[snake.livePosition[1]][snake.livePosition[0]] !== 0) {
+            SoundManager.play('getNum');
+            snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
+            self.scoreLabel.text = snake.score + "点";
+            game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
+          }
           self.numGroup.children.some(function(num) {
             if (num.num_position_array[0] === snake.livePosition[0] && num.num_position_array[1] === snake.livePosition[1]) {
               num.tweener.clear()
@@ -300,6 +320,7 @@ phina.define('MainScene', {
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
+      SoundManager.play('shotBullet');
       const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       bullet.setPosition(snake.x, snake.y);
@@ -373,7 +394,8 @@ phina.define('MainScene', {
       game_array[numPositionY][numPositionX] = num;
       let label = Label({
         text: num,
-        fontSize: BLOCK_SIZE-20
+        fontSize: BLOCK_SIZE-30,
+        fontFamily: "Orbitron"
       }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
       label.num_position_array = [numPositionX, numPositionY];
       }
@@ -381,6 +403,10 @@ phina.define('MainScene', {
   // 棒を出す前に両端で点滅させる
   flash: function(object) {
     object.tweener.clear()
+                  .call(function() {
+                    object.fill = "red";
+                    SoundManager.play("alert");
+                  })
                   .wait(500)
                   .call(function() {
                     object.fill = "transparent";
@@ -388,6 +414,7 @@ phina.define('MainScene', {
                   .wait(500)
                   .call(function() {
                     object.fill = "red";
+                    SoundManager.play("alert");
                   })
                   .wait(500)
                   .call(function() {
@@ -396,6 +423,7 @@ phina.define('MainScene', {
                   .wait(500)
                   .call(function() {
                     object.fill = "red";
+                    SoundManager.play("alert");
                   })
                   .wait(500)
                   .call(function() {
@@ -412,11 +440,17 @@ phina.define('MainScene', {
                        });
   },
   makeBulletItem: function() {
-    let bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
-    let bulletItem = CircleShape({
-      radius: BLOCK_SIZE/4,
-      fill: "blue"
-    }).addChildTo(this).setPosition(this.blockGridX.span(bulletItemPosition[0]), this.blockGridY.span(bulletItemPosition[1]));
+    let flag = true;
+    let bulletItemPosition = []
+    while (flag) {
+      bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
+      if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] !== -1 ||
+          game_array[bulletItemPosition[1]][bulletItemPosition[0]] !== 0) {
+        flag = false; 
+      }
+    }
+    let bulletItem = Sprite('bulletItem').addChildTo(this)
+                                         .setPosition(this.blockGridX.span(bulletItemPosition[0]), this.blockGridY.span(bulletItemPosition[1]));
     game_array[bulletItemPosition[1]][bulletItemPosition[0]] = 100;
     this.bulletItem = bulletItem;
   }
@@ -441,7 +475,7 @@ phina.define('AdviceCircle', {
   init: function() {
     this.superInit({
       radius: BLOCK_SIZE/4,
-      fill: "red",
+      fill: "transparent",
       strokeWidth: 0
     });
   }
@@ -483,5 +517,6 @@ phina.main(function() {
     startLabel: 'main',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
+    assets: ASSETS
   }).run();
 });
