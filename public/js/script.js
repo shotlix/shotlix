@@ -13,7 +13,7 @@ const BLOCK_SIZE = 55,
       NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
       ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
       BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの感覚
-      NUM_STRICT = 10, // 一度に出る数字の個数
+      NUM_STRICT = 7, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
       my_color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
       MY_COLOR = my_color_array[Math.floor(Math.random() * my_color_array.length)],
@@ -131,7 +131,7 @@ phina.define('MainScene', {
       text: 0,
       fontSize: 30,
       fill: "white",
-      fontFamily: "orbitron"
+      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this).setPosition(blockGridX.span(1), 70);
     this.scoreLabel = scoreLabel;
 
@@ -157,7 +157,7 @@ phina.define('MainScene', {
       text: 30,
       fontSize: 40,
       fill: "white",
-      fontFamily: "Orbitron"
+      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 90);
     this.bulletLabel = bulletLabel;
 
@@ -396,8 +396,9 @@ phina.define('MainScene', {
     const self = this;
     var label = Label({
       text: 'GAME OVER',
-      fill: 'yellow',
+      fill: 'red',
       fontSize: 64,
+      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this);
     label.setPosition(this.gridX.center(), this.gridY.center());
     // 少し待ってからタイトル画面へ
@@ -517,7 +518,8 @@ phina.define('Snake', {
   init: function(handle, speedX, speedY) {
     this.superInit({
       radius: SNAKE_SIZE,
-      fill: MY_COLOR
+      fill: MY_COLOR,
+      strokeWidth: 0
     });
     this.beforedirection = handle; //今進んでいる方向
     this.afterdirection = handle; //次ブロックと重なった時に進む方向
