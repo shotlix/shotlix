@@ -23,7 +23,7 @@ let game_array = [], // フィールドの二次元配列
     time = 0, // 全体のタイマー
     rod_start_position = [], //邪魔する棒を出すときの位置を格納する
     canNumWrite = true,
-    before_rod_event_time = 0; //
+    before_rod_event_time = 0; // 前回棒を出した時刻
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
