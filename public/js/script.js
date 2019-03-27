@@ -12,6 +12,7 @@ const BLOCK_SIZE = 60,
       BULLET_SIZE = 10,
       NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
       ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
+      BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの感覚
       NUM_STRICT = 5, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
       color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
@@ -22,8 +23,9 @@ let game_array = [], // フィールドの二次元配列
     num_position_array = [], // 数字の位置の二次元配列
     time = 0, // 全体のタイマー
     rod_start_position = [], //邪魔する棒を出すときの位置を格納する
-    canNumWrite = true,
-    before_rod_event_time = 0; // 前回棒を出した時刻
+    before_rod_event_time = 0, // 前回棒を出した時刻
+    before_bullet_event_time = 0,
+    canNumWrite = true;
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -140,6 +142,10 @@ phina.define('MainScene', {
 
     //数字を作成
     this.makeNum(5);
+    const self = this;
+    setTimeout(function() {
+      self.makeBulletItem();
+    }, 5000);
 
     //銃弾のタイマー
     this.bulletTimer = 0; 
@@ -168,7 +174,9 @@ phina.define('MainScene', {
           setTimeout(function() {
             self.blockGroup.children.some(function(block) {
               if (block.blockPosition[1] === rod_start_position[1] && block.blockPosition[0] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1) {
-                game_array[rod_start_position[1]][block.blockPosition[0]] = -1;
+                if (game_array[rod_start_position[1]][block.blockPosition[0]] !== 100) {
+                  game_array[rod_start_position[1]][block.blockPosition[0]] = -1;
+                }
                 block.fill = "red";
               }
             });
@@ -220,6 +228,22 @@ phina.define('MainScene', {
         if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null || block.fill === "red" || game_array[snake.livePosition[1]][snake.livePosition[0]] === -1) {
           self.killSnake(snake);
           self.gameover();
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100) {
+          snake.bullets += 10;
+          self.bulletLabel.text = "残り" + snake.bullets + "弾";
+          self.bulletItem.tweener.clear()
+                                 .to({
+                                   scaleX: 0.1,
+                                   scaleY: 0.1,
+                                   rotation: 360
+                                 }, 500)
+                                 .call(function() {
+                                   setTimeout(function() {
+                                     self.makeBulletItem();
+                                   }, BULLET_EVENT_RANGE);
+                                   self.bulletItem.remove();
+                                 });
+          game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
         } else {
           snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
           self.scoreLabel.text = snake.score + "点";
@@ -302,7 +326,9 @@ phina.define('MainScene', {
         if (Math.abs(bullet.x-block.x) < BLOCK_SIZE/4*3 && Math.abs(bullet.y-block.y) < BLOCK_SIZE/4*3 && 
             block.blockPosition[0] !== 0 && block.blockPosition[1] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1 && block.blockPosition[1] !== GRID_NUM_Y-1 &&
             game_array[block.blockPosition[1]][block.blockPosition[0]] !== 0) {
-          game_array[block.blockPosition[1]][block.blockPosition[0]] = 0;
+          if (game_array[block.blockPosition[1]][block.blockPosition[0]] !== 100) {
+            game_array[block.blockPosition[1]][block.blockPosition[0]] = 0;
+          }
           block.fill = "#D5D5D7";
         }
       })
@@ -386,7 +412,13 @@ phina.define('MainScene', {
                        });
   },
   makeBulletItem: function() {
-    //銃弾補充アイテム
+    let bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
+    let bulletItem = CircleShape({
+      radius: BLOCK_SIZE/4,
+      fill: "blue"
+    }).addChildTo(this).setPosition(this.blockGridX.span(bulletItemPosition[0]), this.blockGridY.span(bulletItemPosition[1]));
+    game_array[bulletItemPosition[1]][bulletItemPosition[0]] = 100;
+    this.bulletItem = bulletItem;
   }
 });
 
