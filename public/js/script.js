@@ -114,8 +114,16 @@ phina.define('MainScene', {
       text: 0 + "点",
       fontSize: 50,
       fill: "red"
-    }).addChildTo(this).setPosition(100,50);
+    }).addChildTo(this).setPosition(blockGridX.span(1), 25);
     this.scoreLabel = scoreLabel
+
+    //弾数表示
+    let bulletLabel = Label({
+      text: "残り30弾",
+      fontSize: 50,
+      fill: "red"
+    }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 25);
+    this.bulletLabel = bulletLabel;
 
     //ユーザー（snake）を作成
     let [handle, speedX, speedY] = createSnakeInfo();
@@ -140,6 +148,7 @@ phina.define('MainScene', {
   update: function(app) {
     const self = this;
     time += app.deltaTime;
+    // 前回棒を出した時刻から一定時間経つと棒を出すイベントを発火
     if (time-before_rod_event_time > ROD_EVENT_RANGE) {
       if (time % 2 === 0) {
         rod_start_position = [0, randRange(1, GRID_NUM_Y-2)];
@@ -207,11 +216,8 @@ phina.define('MainScene', {
             snake.livePosition[1] += 1;
             break;
         }
-        //game_arrayの値による処理
-        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null) {
-          self.killSnake(snake);
-          self.gameover();
-        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === -1) {
+        //場外に出た時
+        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null || block.fill === "red" || game_array[snake.livePosition[1]][snake.livePosition[0]] === -1) {
           self.killSnake(snake);
           self.gameover();
         } else {
@@ -269,7 +275,7 @@ phina.define('MainScene', {
     }
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
-    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && snake) {
+    if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       switch(bullet.direction) {
@@ -287,6 +293,7 @@ phina.define('MainScene', {
           break;
       }
       snake.bullets--;
+      this.bulletLabel.text = "残り" + snake.bullets + "弾";
       this.bulletTimer = 0;
     }
     this.bulletGroup.children.some(function(bullet) {
@@ -304,6 +311,14 @@ phina.define('MainScene', {
           bullet.moveBy(0, BULLET_SPEED);
           break;
       }
+      self.blockGroup.children.some(function(block) {
+        if (Math.abs(bullet.x-block.x) < BLOCK_SIZE/4*3 && Math.abs(bullet.y-block.y) < BLOCK_SIZE/4*3 && 
+            block.blockPosition[0] !== 0 && block.blockPosition[1] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1 && block.blockPosition[1] !== GRID_NUM_Y-1 &&
+            game_array[block.blockPosition[1]][block.blockPosition[0]] !== 0) {
+          game_array[block.blockPosition[1]][block.blockPosition[0]] = 0;
+          block.fill = "#D5D5D7";
+        }
+      })
       if (bullet.x > SCREEN_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
         bullet.remove();
       }
@@ -321,7 +336,7 @@ phina.define('MainScene', {
     label.tweener.clear()
                  .wait(5000)
                  .call(function() {
-                   //location.href = "/";
+                   location.href = "/";
                  });
   },
   makeNum: function(count) {
@@ -329,14 +344,16 @@ phina.define('MainScene', {
       let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
       for (j=0; j<num_position_array.length; j++) {
         if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
-          i -= 1;
-          canNumWrite = false;
-        } 
+          if (game_array[numPositionY][numPositionX] === -1) {
+            i -= 1;
+            canNumWrite = false
+          }
+        }
       }
       if (!canNumWrite) {
         canNumWrite = true;
         continue;
-      } 
+      }
       num_position_array.push([numPositionX, numPositionY]);
       let num = randRange(1,99);
       game_array[numPositionY][numPositionX] = num;
@@ -374,6 +391,7 @@ phina.define('MainScene', {
     snake.tweener.clear()
                        .scaleTo(0.1, 50)
                        .call(function() {
+                         snake.isDead = true
                          snake.remove();
                        })
   }
@@ -417,6 +435,7 @@ phina.define('Snake', {
     this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
     this.score = 0;
+    this.isDead = false;
   }
 });
 
