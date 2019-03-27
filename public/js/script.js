@@ -15,11 +15,10 @@ const BLOCK_SIZE = 55,
       BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの感覚
       NUM_STRICT = 7, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
-      my_color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
-      MY_COLOR = my_color_array[Math.floor(Math.random() * my_color_array.length)],
-      background_color_array = ['#FFB29A', '#ACC3FF', '#A1CA93'],
+      MY_COLOR = "white",
+      background_color_array = [['#FF837B', '#FFB29A'], ['#7C90F9', '#ACC3FF'], ['#75AE66', '#A1CA93']],
       BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)],
-      BLOCK_COLOR = '#FF7394';
+      BLOCK_COLOR = "#E5F6FF";
 
 let game_array = [], // フィールドの二次元配列
     game_array_element = [],
@@ -93,7 +92,7 @@ phina.define('MainScene', {
   //初期化処理
   init: function(options) {
     this.superInit(options);
-    this.backgroundColor = BACKGROUND_COLOR;
+    this.backgroundColor = BACKGROUND_COLOR[1];
     //X方向、Y方向のGridをスクリーン幅に応じて作成
     const blockGridX = Grid({
       width: SCREEN_WIDTH,
@@ -119,7 +118,7 @@ phina.define('MainScene', {
             Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           } else {
-            Block("white", j, i).addChildTo(blockGroup)
+            Block(BACKGROUND_COLOR[0], j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           }
         }
@@ -384,7 +383,7 @@ phina.define('MainScene', {
           if (game_array[block.blockPosition[1]][block.blockPosition[0]] === -1) {
             game_array[block.blockPosition[1]][block.blockPosition[0]] = 0;
           }
-          block.fill = "white";
+          block.fill = BACKGROUND_COLOR[0];
         }
       })
       if (bullet.x > SCREEN_WIDTH || bullet.x < 0 || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
