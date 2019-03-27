@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
 const PORT = process.env.PORT || 8000;
 const helmet = require('helmet');
 
@@ -10,10 +9,6 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/' , function(req, res){
     res.sendFile(__dirname+'/index.html');
-});
-
-io.on('connection',function(socket){
-    
 });
 
 http.listen(PORT, function(){
