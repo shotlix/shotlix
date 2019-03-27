@@ -278,20 +278,7 @@ phina.define('MainScene', {
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
-      switch(bullet.direction) {
-        case 'right':
-          bullet.setPosition(snake.x+SNAKE_SIZE+BULLET_SIZE/2+1, snake.y);
-          break;
-        case 'up':
-          bullet.setPosition(snake.x, snake.y-SNAKE_SIZE-BULLET_SIZE/2-1);
-          break;
-        case 'left':
-          bullet.setPosition(snake.x-SNAKE_SIZE-BULLET_SIZE/2-1, snake.y);
-          break;
-        case 'down':
-          bullet.setPosition(snake.x, snake.y+SNAKE_SIZE+BULLET_SIZE/2+1);
-          break;
-      }
+      bullet.setPosition(snake.x, snake.y);
       snake.bullets--;
       this.bulletLabel.text = "残り" + snake.bullets + "弾";
       this.bulletTimer = 0;
@@ -339,6 +326,7 @@ phina.define('MainScene', {
                    location.href = "/";
                  });
   },
+  // 被らない場所に数字を出す
   makeNum: function(count) {
     for (i=0; i<count; i++) {
       let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
@@ -364,6 +352,7 @@ phina.define('MainScene', {
       label.num_position_array = [numPositionX, numPositionY];
       }
   },
+  // 棒を出す前に両端で点滅させる
   flash: function(object) {
     object.tweener.clear()
                   .wait(500)
@@ -387,6 +376,7 @@ phina.define('MainScene', {
                     object.remove();
                   });
   },
+  //ユーザをアニメーションと共に殺す
   killSnake: function(snake) {
     snake.tweener.clear()
                        .scaleTo(0.1, 50)
@@ -394,6 +384,9 @@ phina.define('MainScene', {
                          snake.isDead = true
                          snake.remove();
                        })
+  },
+  makeBulletItem: function() {
+
   }
 });
 
