@@ -60,7 +60,7 @@ const createSnakeInfo = () => {
 for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
   for (let j=0; j<GRID_NUM_X; j++) {
-    if (i === 0 || i === GRID_NUM_Y-1) {
+    if (i === 0 || i === GRID_NUM_Y-1 || i === 1) {
       game_array_element.push(null);
     } else {
       if (j === 0 || j === GRID_NUM_X-1) {
@@ -172,9 +172,9 @@ phina.define('MainScene', {
     // 前回棒を出した時刻から一定時間経つと棒を出すイベントを発火
     if (time-before_rod_event_time > ROD_EVENT_RANGE) {
       if (time % 2 === 0) {
-        rod_start_position = [0, randRange(1, GRID_NUM_Y-2)];
+        rod_start_position = [0, randRange(2, GRID_NUM_Y-2)];
       } else {
-        rod_start_position = [randRange(1, GRID_NUM_X-2), 0];
+        rod_start_position = [randRange(1, GRID_NUM_X-2), 1];
       }
       switch (rod_start_position[0]) {
         case 0:
@@ -188,7 +188,9 @@ phina.define('MainScene', {
           this.flash(adviceRightCircle);
           setTimeout(function() {
             self.blockGroup.children.some(function(block) {
-              if (block.blockPosition[1] === rod_start_position[1] && block.blockPosition[0] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1) {
+              if (block.blockPosition[1] === rod_start_position[1] && 
+                  block.blockPosition[0] !== 0 && 
+                  block.blockPosition[0] !== GRID_NUM_X-1) {
                 if (game_array[rod_start_position[1]][block.blockPosition[0]] === 0 && game_array[rod_start_position[1]][block.blockPosition[0]] !== 100) {
                   game_array[rod_start_position[1]][block.blockPosition[0]] = -1;
                 }
@@ -209,7 +211,10 @@ phina.define('MainScene', {
           this.flash(adviceUnderCircle);
           setTimeout(function() {
             self.blockGroup.children.some(function(block) {
-              if (block.blockPosition[0] === rod_start_position[0] && block.blockPosition[1] !== 0 && block.blockPosition[1] !== GRID_NUM_Y-1) {
+              if (block.blockPosition[0] === rod_start_position[0] && 
+                  block.blockPosition[1] !== 0 && 
+                  block.blockPosition[1] !== GRID_NUM_Y-1 &&
+                  block.blockPosition[1] !== 1) {
                 if (game_array[block.blockPosition[1]][rod_start_position[0]] === 0 && game_array[block.blockPosition[1]][rod_start_position[0]] !== 100) {
                   game_array[block.blockPosition[1]][rod_start_position[0]] = -1;
                 }
@@ -382,7 +387,7 @@ phina.define('MainScene', {
   // 被らない場所に数字を出す
   makeNum: function(count) {
     for (i=0; i<count; i++) {
-      let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
+      let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
       for (j=0; j<num_position_array.length; j++) {
         if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
             i -= 1;
@@ -447,7 +452,7 @@ phina.define('MainScene', {
     let flag = true;
     let bulletItemPosition = []
     while (flag) {
-      bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(1, GRID_NUM_Y-2)];
+      bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
       if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] !== -1 ||
           game_array[bulletItemPosition[1]][bulletItemPosition[0]] !== 0) {
         flag = false; 
