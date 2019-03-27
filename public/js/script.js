@@ -115,7 +115,7 @@ phina.define('MainScene', {
       fontSize: 50,
       fill: "red"
     }).addChildTo(this).setPosition(blockGridX.span(1), 25);
-    this.scoreLabel = scoreLabel
+    this.scoreLabel = scoreLabel;
 
     //弾数表示
     let bulletLabel = Label({
@@ -237,7 +237,7 @@ phina.define('MainScene', {
                              self.makeNum(1);
                            }, NUM_EVENT_RANGE);
                            num.remove();
-                         })
+                         });
             }
           });
         }
@@ -334,7 +334,7 @@ phina.define('MainScene', {
         if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
           if (game_array[numPositionY][numPositionX] === -1) {
             i -= 1;
-            canNumWrite = false
+            canNumWrite = false;
           }
         }
       }
@@ -383,10 +383,10 @@ phina.define('MainScene', {
                        .call(function() {
                          snake.isDead = true
                          snake.remove();
-                       })
+                       });
   },
   makeBulletItem: function() {
-
+    //銃弾補充アイテム
   }
 });
 
@@ -411,9 +411,9 @@ phina.define('AdviceCircle', {
       radius: BLOCK_SIZE/4,
       fill: "red",
       strokeWidth: 0
-    })
+    });
   }
-})
+});
 
 phina.define('Snake', {
   superClass: 'CircleShape',
