@@ -130,7 +130,8 @@ phina.define('MainScene', {
     let scoreLabel = Label({
       text: 0 + "点",
       fontSize: 50,
-      fill: BLOCK_COLOR
+      fill: BLOCK_COLOR,
+      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this).setPosition(blockGridX.span(1), 25);
     this.scoreLabel = scoreLabel;
 
@@ -138,7 +139,8 @@ phina.define('MainScene', {
     let bulletLabel = Label({
       text: "残り30弾",
       fontSize: 50,
-      fill: BLOCK_COLOR
+      fill: BLOCK_COLOR,
+      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 25);
     this.bulletLabel = bulletLabel;
 
@@ -375,6 +377,7 @@ phina.define('MainScene', {
       text: 'GAME OVER',
       fill: 'yellow',
       fontSize: 64,
+      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this);
     label.setPosition(this.gridX.center(), this.gridY.center());
     // 少し待ってからタイトル画面へ
@@ -404,7 +407,7 @@ phina.define('MainScene', {
       let label = Label({
         text: num,
         fontSize: BLOCK_SIZE-30,
-        fontFamily: "Orbitron"
+        fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
       }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
       label.num_position_array = [numPositionX, numPositionY];
       }
