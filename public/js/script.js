@@ -18,8 +18,8 @@ const BLOCK_SIZE = 55,
       my_color_array = ['blue', 'green', 'yellow', 'purple', 'white', 'orange', 'pink'],
       MY_COLOR = my_color_array[Math.floor(Math.random() * my_color_array.length)],
       background_color_array = ['#FFB29A', '#ACC3FF', '#A1CA93'],
-      BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)];
-      BLOCK_COLOR = '#FF7394'
+      BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)],
+      BLOCK_COLOR = '#FF7394';
 
 let game_array = [], // フィールドの二次元配列
     game_array_element = [],
@@ -76,15 +76,15 @@ for (let i=0; i<GRID_NUM_Y; i++) {
 //ASSET定義
 const ASSETS = {
   image: {
-    'bulletItem': './assets/images/bulletItem.png',
+    'bulletItem': '../assets/images/bulletItem.png',
   },
   sound: {
-    'getBullet': './assets/sounds/getBullet.mp3',
-    'shotBullet': './assets/sounds/shotBullet.mp3',
-    'dead': './assets/sounds/dead.mp3',
-    'getNum': './assets/sounds/getNum.mp3',
-    'alert': './assets/sounds/alert.mp3',
-    'rodEvent': './assets/sounds/rodEvent.mp3',
+    'getBullet': '../assets/sounds/getBullet.mp3',
+    'shotBullet': '../assets/sounds/shotBullet.mp3',
+    'dead': '../assets/sounds/dead.mp3',
+    'getNum': '../assets/sounds/getNum.mp3',
+    'alert': '../assets/sounds/alert.mp3',
+    'rodEvent': '../assets/sounds/rodEvent.mp3',
   },
 };
 
@@ -128,18 +128,37 @@ phina.define('MainScene', {
 
     //点数表示
     let scoreLabel = Label({
-      text: 0 + "点",
-      fontSize: 50,
-      fill: BLOCK_COLOR
-    }).addChildTo(this).setPosition(blockGridX.span(1), 25);
+      text: 0,
+      fontSize: 30,
+      fill: "white",
+      fontFamily: "orbitron"
+    }).addChildTo(this).setPosition(blockGridX.span(1), 70);
     this.scoreLabel = scoreLabel;
+
+    let scoreBar = RectangleShape({
+      width: 0,
+      height: 10,
+      strokeWidth: 0,
+      fill: "white",
+      radius: 100
+    }).addChildTo(this).setPosition(53, 100);
+    scoreBar.setOrigin(0, 0.5);
+    this.scoreBar = scoreBar;
+
+    Label({
+      text: '残弾数',
+      fontSize: 18,
+      fontFamily: "Yuanti TC",
+      fill: "white"
+    }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 50);
 
     //弾数表示
     let bulletLabel = Label({
-      text: "残り30弾",
-      fontSize: 50,
-      fill: BLOCK_COLOR
-    }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 25);
+      text: 30,
+      fontSize: 40,
+      fill: "white",
+      fontFamily: "Orbitron"
+    }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 90);
     this.bulletLabel = bulletLabel;
 
     //ユーザー（snake）を作成
@@ -258,7 +277,7 @@ phina.define('MainScene', {
         } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100 && !snake.isDead) {
           SoundManager.play('getBullet');
           snake.bullets += 10;
-          self.bulletLabel.text = "残り" + snake.bullets + "弾";
+          self.bulletLabel.text = snake.bullets;
           self.bulletItem.tweener.clear()
                                  .to({
                                    scaleX: 0.1,
@@ -276,7 +295,11 @@ phina.define('MainScene', {
           if (game_array[snake.livePosition[1]][snake.livePosition[0]] !== 0) {
             SoundManager.play('getNum');
             snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
-            self.scoreLabel.text = snake.score + "点";
+            self.scoreLabel.text = snake.score;
+            self.scoreBar.tweener.clear()
+                                 .to({
+                                   width: snake.score/5
+                                 }, (snake.score-game_array[snake.livePosition[1]][snake.livePosition[0]])*2);
             game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
           }
           self.numGroup.children.some(function(num) {
@@ -336,7 +359,7 @@ phina.define('MainScene', {
       bullet.direction = snake.beforedirection;
       bullet.setPosition(snake.x, snake.y);
       snake.bullets--;
-      this.bulletLabel.text = "残り" + snake.bullets + "弾";
+      this.bulletLabel.text = snake.bullets;
       this.bulletTimer = 0;
     }
     this.bulletGroup.children.some(function(bullet) {
@@ -453,8 +476,7 @@ phina.define('MainScene', {
     let bulletItemPosition = []
     while (flag) {
       bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
-      if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] !== -1 ||
-          game_array[bulletItemPosition[1]][bulletItemPosition[0]] !== 0) {
+      if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] === 0 || game_array[bulletItemPosition[1]][bulletItemPosition[0]] === -1) {
         flag = false; 
       }
     }
