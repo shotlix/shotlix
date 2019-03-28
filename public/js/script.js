@@ -12,13 +12,17 @@ const BLOCK_SIZE = 55,
       BULLET_SIZE = 10,
       NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
       ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
-      BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの感覚
+      BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの間隔
+      POINT_TWICE_EVENT_RANGE = 45000, //ポイント２倍アイテムを出すイベントの間隔
+      POINT_TWICE_TIME = 10000, //ポイントが２倍になる時間
+      BULLET_PLUS = 5,
       NUM_STRICT = 7, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
       MY_COLOR = "white",
-      background_color_array = [['#FF837B', '#FFB29A'], ['#7C90F9', '#ACC3FF'], ['#75AE66', '#A1CA93'], ['#977CE1', '#BF9FEE']],
+      background_color_array = [['#FF837B', '#FFB29A', '#A14848'], ['#7C90F9', '#ACC3FF', '#545895'],
+                                ['#75AE66', '#A1CA93', '#427B44'], ['#977CE1', '#BF9FEE', '#715495']],
       BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)],
-      BLOCK_COLOR = "#E5F6FF";
+      BLOCK_COLOR = BACKGROUND_COLOR[2];
 
 let game_array = [], // フィールドの二次元配列
     game_array_element = [],
@@ -28,6 +32,7 @@ let game_array = [], // フィールドの二次元配列
     before_rod_event_time = 0, // 前回棒を出した時刻
     before_bullet_event_time = 0,
     canNumWrite = true;
+    point_twice_start_time = 0;
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -76,6 +81,7 @@ for (let i=0; i<GRID_NUM_Y; i++) {
 const ASSETS = {
   image: {
     'bulletItem': '../assets/images/bulletItem.png',
+    'pointTwiceItem': '../assets/images/pointTwiceItem.png',
   },
   sound: {
     'getBullet': '../assets/sounds/getBullet.mp3',
@@ -84,6 +90,7 @@ const ASSETS = {
     'getNum': '../assets/sounds/getNum.mp3',
     'alert': '../assets/sounds/alert.mp3',
     'rodEvent': '../assets/sounds/rodEvent.mp3',
+    'getTwiceItem': '../assets/sounds/getTwiceItem.mp3',
   },
 };
 
@@ -178,15 +185,30 @@ phina.define('MainScene', {
     const self = this;
     setTimeout(function() {
       self.makeBulletItem();
-    }, 5000);
+    }, 10000);
+
+    //点数２倍アイテムを作成
+    setTimeout(function() {
+      self.makePointTwiceItem();
+    }, 20000)
 
     //銃弾のタイマー
     this.bulletTimer = 0; 
   },
   //毎フレーム実行する処理
   update: function(app) {
+    const snake = this.snake;
+    const key = app.keyboard;
     const self = this;
     time += app.deltaTime;
+    // ポイント２倍期間が過ぎるとそれを止め、一定時間後にまた出す
+    if (time-point_twice_start_time > POINT_TWICE_TIME && snake.isPointTwice) {
+      snake.isPointTwice = false;
+      point_twice_start_time = time;
+      setTimeout(function() {
+        self.makePointTwiceItem();
+      }, POINT_TWICE_EVENT_RANGE);
+    }
     // 前回棒を出した時刻から一定時間経つと棒を出すイベントを発火
     if (time-before_rod_event_time > ROD_EVENT_RANGE) {
       if (time % 2 === 0) {
@@ -245,8 +267,6 @@ phina.define('MainScene', {
       }
       before_rod_event_time = time;
     }
-    const snake = this.snake;
-    const key = app.keyboard;
     snake.moveBy(snake.speed[0], snake.speed[1]);
     this.blockGroup.children.some(function(block) {
       //snakeとblockが重なった場合の処理
@@ -275,7 +295,7 @@ phina.define('MainScene', {
           self.gameover();
         } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100 && !snake.isDead) {
           SoundManager.play('getBullet');
-          snake.bullets += 10;
+          snake.bullets += BULLET_PLUS;
           self.bulletLabel.text = snake.bullets;
           self.bulletItem.tweener.clear()
                                  .to({
@@ -290,10 +310,39 @@ phina.define('MainScene', {
                                    self.bulletItem.remove();
                                  });
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 200 && !snake.isDead) {
+          SoundManager.play('getTwiceItem');
+          self.pointTwiceItem.tweener.clear()
+                                     .to({
+                                       scaleX: 0.1,
+                                       scaleY: 0.1,
+                                       rotation: 360
+                                     }, 500)
+                                     .call(function() {
+                                       snake.isPointTwice = true;
+                                       self.pointTwiceItem.remove();
+                                       point_twice_start_time = time;
+                                     });
+          game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
         } else if (!snake.isDead) {
           if (game_array[snake.livePosition[1]][snake.livePosition[0]] !== 0) {
+            if (snake.isPointTwice) {
+              let pointTwiceLabel = Label({
+                text: "×2",
+                fill: "white",
+                fontSize: (BLOCK_SIZE-30)/4*3,
+                fontFamily: "'Orbitron', 'MS ゴシック",
+              }).addChildTo(self).setPosition(snake.x+SNAKE_SIZE, snake.y-SNAKE_SIZE);
+              setTimeout(function() {
+                pointTwiceLabel.remove();
+              }, 500);
+            }
             SoundManager.play('getNum');
-            snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
+            if (snake.isPointTwice) {
+              snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]]*2;
+            } else {
+              snake.score += game_array[snake.livePosition[1]][snake.livePosition[0]];
+            }
             self.scoreLabel.text = snake.score;
             self.scoreBar.tweener.clear()
                                  .to({
@@ -427,7 +476,8 @@ phina.define('MainScene', {
       let label = Label({
         text: num,
         fontSize: BLOCK_SIZE-30,
-        fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
+        fontFamily: "'Orbitron', 'ＭＳ ゴシック'",
+        fill: "white"
       }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
       label.num_position_array = [numPositionX, numPositionY];
       }
@@ -472,18 +522,32 @@ phina.define('MainScene', {
                        });
   },
   makeBulletItem: function() {
-    let flag = true;
+    let bulletFlag = true;
     let bulletItemPosition = []
-    while (flag) {
+    while (bulletFlag) {
       bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
       if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] === 0 || game_array[bulletItemPosition[1]][bulletItemPosition[0]] === -1) {
-        flag = false; 
+        bulletFlag = false; 
       }
     }
     let bulletItem = Sprite('bulletItem').addChildTo(this)
                                          .setPosition(this.blockGridX.span(bulletItemPosition[0]), this.blockGridY.span(bulletItemPosition[1]));
     game_array[bulletItemPosition[1]][bulletItemPosition[0]] = 100;
     this.bulletItem = bulletItem;
+  },
+  makePointTwiceItem: function() {
+    let pointFlag = true;
+    let pointTwiceItemPosition = []
+    while (pointFlag) {
+      pointTwiceItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
+      if (game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] === 0 || game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] === -1) {
+        pointFlag = false; 
+      }
+    }
+    let pointTwiceItem = Sprite('pointTwiceItem').addChildTo(this)
+                                                 .setPosition(this.blockGridX.span(pointTwiceItemPosition[0]), this.blockGridY.span(pointTwiceItemPosition[1]));
+    game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] = 200;
+    this.pointTwiceItem = pointTwiceItem;
   }
 });
 
@@ -527,6 +591,7 @@ phina.define('Snake', {
     this.bullets = 30;
     this.score = 0;
     this.isDead = false;
+    this.isPointTwice = false;
   }
 });
 
