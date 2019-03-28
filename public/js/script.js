@@ -33,6 +33,7 @@ let game_array = [], // フィールドの二次元配列
     before_bullet_event_time = 0,
     canNumWrite = true;
     point_twice_start_time = 0;
+    score = 0;
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -291,6 +292,7 @@ phina.define('MainScene', {
           if (!snake.isDead) {
             SoundManager.play('dead');
           }
+          score = snake.score;
           self.killSnake(snake);
           self.gameover();
         } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100 && !snake.isDead) {
@@ -445,15 +447,20 @@ phina.define('MainScene', {
     var label = Label({
       text: 'GAME OVER',
       fill: 'red',
-      fontSize: 64,
+      fontSize: 100,
       fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
     }).addChildTo(this);
-    label.setPosition(this.gridX.center(), this.gridY.center());
+    label.setPosition(this.gridX.center(), this.blockGridY.center());
     // 少し待ってからタイトル画面へ
     label.tweener.clear()
                  .wait(5000)
                  .call(function() {
-                   location.href = "/";
+                  $("#hidden_form").append($("<input />", {
+                    type: 'hidden',
+                    name: 'score',
+                    value: score
+                  }));
+                  $("#hidden_form").submit();
                  });
   },
   // 被らない場所に数字を出す
