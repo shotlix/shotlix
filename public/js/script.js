@@ -16,7 +16,7 @@ const BLOCK_SIZE = 55,
       NUM_STRICT = 7, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
       MY_COLOR = "white",
-      background_color_array = [['#FF837B', '#FFB29A'], ['#7C90F9', '#ACC3FF'], ['#75AE66', '#A1CA93']],
+      background_color_array = [['#FF837B', '#FFB29A'], ['#7C90F9', '#ACC3FF'], ['#75AE66', '#A1CA93'], ['#977CE1', '#BF9FEE']],
       BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)],
       BLOCK_COLOR = "#E5F6FF";
 
