@@ -44,7 +44,7 @@ app.get('/', function(req, res, next){
 });
 
 app.post('/', function(req, res, next) {
-    const name = req.body.name;
+    const name = req.body.name.slice(0, 10);
     const score = parseInt(req.body.score);
     Ranking.create({
         name: name,
