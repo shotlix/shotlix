@@ -51,23 +51,27 @@ app.post('/', function(req, res, next) {
         score: score,
         createdAt: new Date()
     }).then(() => {
-        Ranking.findAll().then((ranking) => {
-            ranking.sort((a, b) => {
-                if (a.score > b.score) return -1;
-                if (a.score < b.score) return 1;
-                return 0;
-            });
-            let count = 1;
-            ranking.forEach(function(rank) {
-                rank.rank = count;
-                count++;
-            });
-            res.render('ranking', {
-                isPlayed: true,
-                name: req.body.name,
-                score: req.body.score,
-                ranking: ranking,
-            });
+        res.redirect('/ranking');
+    });
+});
+
+app.get('/ranking', function(req, res, next) {
+    Ranking.findAll().then((ranking) => {
+        ranking.sort((a, b) => {
+            if (a.score > b.score) return -1;
+            if (a.score < b.score) return 1;
+            return 0;
+        });
+        let count = 1;
+        ranking.forEach(function(rank) {
+            rank.rank = count;
+            count++;
+        });
+        res.render('ranking', {
+            isPlayed: true,
+            name: req.body.name,
+            score: req.body.score,
+            ranking: ranking,
         });
     });
 });
