@@ -57,11 +57,16 @@ app.post('/', function(req, res, next) {
                 if (a.score < b.score) return 1;
                 return 0;
             });
-            res.render('index', {
+            let count = 1;
+            ranking.forEach(function(rank) {
+                rank.rank = count;
+                count++;
+            });
+            res.render('ranking', {
                 isPlayed: true,
                 name: req.body.name,
                 score: req.body.score,
-                ranking: ranking
+                ranking: ranking,
             });
         });
     });
