@@ -8,17 +8,18 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
+  i {
+    position: relative;
+      right: 430px;
+      bottom: 10px;
+    font-size: 40px;
+  }
+  h1 {
+    font-size: 60px;
+    color: white;
+  }
 }
-header i {
-  position: relative;
-    right: 430px;
-    bottom: 10px;
-  font-size: 40px;
-}
-header h1 {
-  font-size: 60px;
-  color: white;
-}
+
 main {
   display: flex;
   justify-content: center;
@@ -32,32 +33,32 @@ main {
   border-radius: 12px;
   color: #FF837B;
   margin-bottom: 25px;
-}
-.ranking-left {
-  display: flex;
-  align-items: center;
-  width: 30%;
-}
-.ranking-left i {
-  font-size: 25px;
-  position: relative;
-      left: 20px;
-      bottom: 3px;
-  width: 30%;
-}
-.ranking-left p {
-  font-size: 36px;
-}
-.ranking-center {
-  width: 50%
-}
-.ranking-center h2 {
-  font-weight: 900;
-  font-size: 45px;
-}
-.ranking-right {
-  width: 20%;
-}
-.ranking-right p {
-  font-size: 30px;
+  &-center {
+    width: 50%;
+    h2 {
+      font-weight: 900;
+      font-size: 45px;
+    }
+  }
+  &-left {
+    display: flex;
+    align-items: center;
+    width: 30%;
+    i {
+      font-size: 25px;
+      position: relative;
+          left: 20px;
+          bottom: 3px;
+      width: 30%;
+    }
+    p {
+      font-size: 36px;
+    }
+  }
+  &-right {
+    width: 20%;
+    p {
+      font-size: 30px;
+    }
+  }
 }
