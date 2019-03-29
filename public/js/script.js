@@ -34,6 +34,7 @@ let game_array = [], // フィールドの二次元配列
     canNumWrite = true;
     point_twice_start_time = 0;
     score = 0;
+    isSubmitted = false;
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -94,6 +95,119 @@ const ASSETS = {
     'getTwiceItem': '../assets/sounds/getTwiceItem.mp3',
   },
 };
+
+phina.define('LoadingScene', {
+  superClass: 'DisplayScene',
+
+  init: function(options) {
+    this.superInit(options);
+    var self = this;
+    this.backgroundColor = "#F1E6EF";
+
+    // view
+    var baseLayer = DisplayElement(options).addChildTo(this);
+
+    // ラベル
+    var label = Label({
+      text: "NOW LOADING...",
+      fontFamily: "'Orbitron', 'MS ゴシック'",
+    })
+    .addChildTo(baseLayer)
+    .setPosition(this.width*0.5, this.height*0.2)
+    label.tweener.clear()
+    .setLoop(1)
+    .to({alpha:0}, 500)
+    .to({alpha:1}, 500)
+    ;
+    
+    // くるくるまわる円
+    var circle = phina.display.CircleShape({
+      stroke: "#9467B7",
+      fill: false,
+      radius: 100,
+      strokeWidth: 16,
+    })
+    .addChildTo(baseLayer)
+    .setPosition(this.width*0.5, this.height*0.4)
+    circle.tweener.clear()
+    .setLoop(1)
+    .to({scaleX: -1}, 900, "easeInOutCubic")
+    .to({scaleX: 1}, 900, "easeInOutCubic")
+    ;
+    
+    // ゲージ
+    var gauge = phina.ui.Gauge({
+      value: 0,
+      gaugeColor: "#41E564",
+    })
+    .setPosition(this.width*0.5, this.height*0.75)
+    .addChildTo(baseLayer);
+    gauge.animationTime = 5000;
+
+
+    // フロー
+    var flows = [];
+
+    // ローダー処理
+    var loader = phina.asset.AssetLoader();
+    var loaderFlow = phina.util.Flow(function(resolve) {
+
+      // 進行
+      loader.onprogress = function(e) {
+       console.log(e)
+       gauge.value = e.progress * 80;
+      };
+
+      // ロード完了
+      loader.onload = function() {
+        resolve("loader loaded!");
+      };
+    });
+    flows.push(loaderFlow);
+    loader.load(options.assets);
+
+    // 時間稼ぎ用の仮処理
+    var otherFlow = phina.util.Flow(function(resolve) {
+      setTimeout(function() {
+        resolve("owari!");
+      }, 3000)
+    });
+    flows.push(otherFlow);
+
+    // 全て終わったら
+    phina.util.Flow.all(flows).then(function(args) {
+
+      //ゲージ即座に100％に
+      gauge.animationTime = 1;
+      gauge.value = 100;
+
+      // くるくる止める
+      circle.stroke = "#2BF439";
+      circle.tweener.clear()
+      .to({scaleX: 1}, 350)
+
+      label.text = "LOAD COMPLETE";
+      label.tweener.clear()
+      .to({alpha:0}, 100)
+      .to({alpha:1}, 100)
+      .to({alpha:0}, 100)
+      .to({alpha:1}, 100)
+      .to({alpha:0}, 100)
+      .to({alpha:1}, 100)
+      .wait(750)
+      .call(function() {
+        baseLayer.tweener.clear()
+        .by({alpha: -1, y:-70}, 300, 'easeInQuad')
+        .wait(300)
+        .call(function() {
+          // self.replaceScene(scene);
+          // self.app.popScene();
+          self.flare('loaded');
+        });
+      });
+    });
+  },
+});
 
 phina.define('MainScene', {
   superClass: 'DisplayScene',
@@ -455,12 +569,15 @@ phina.define('MainScene', {
     label.tweener.clear()
                  .wait(5000)
                  .call(function() {
-                  $("#hidden_form").append($("<input />", {
-                    type: 'hidden',
-                    name: 'score',
-                    value: score
-                  }));
-                  $("#hidden_form").submit();
+                  if (!isSubmitted) {
+                    $("#hidden_form").append($("<input />", {
+                      type: 'hidden',
+                      name: 'score',
+                      value: score
+                    }));
+                    $("#hidden_form").submit();
+                    isSubmitted = true;
+                  }
                  });
   },
   // 被らない場所に数字を出す
