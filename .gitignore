@@ -64,3 +64,5 @@ typings/
 
 /src/config/firebase.js
 firebase.js
+
+package-lock.json

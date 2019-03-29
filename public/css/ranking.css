@@ -61,3 +61,7 @@ main {
 .ranking-right p {
   font-size: 30px;
 }
+
+.fa-arrow-alt-circle-left:before{
+  color: #fff;
+}
