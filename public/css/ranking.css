@@ -1,0 +1,6 @@
+div {
+  display: flex;
+}
+div p {
+  margin-right: 50px;
+}
