@@ -7,3 +7,17 @@ h2 {
     top: 90px;
   font-size: 20px;
 }
+#black-cover {
+  width: 100%;
+  height: 100vh;
+  background-color: black;
+  opacity: 0.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#black-cover h1 {
+  font-size: 80px;
+  color: white;
+  font-family: 'Orbitron', 'MS ゴシック';
+}

@@ -35,6 +35,7 @@ let game_array = [], // フィールドの二次元配列
     point_twice_start_time = 0;
     score = 0;
     isSubmitted = false;
+    isFinished = false;
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -93,6 +94,7 @@ const ASSETS = {
     'alert': '../assets/sounds/alert.mp3',
     'rodEvent': '../assets/sounds/rodEvent.mp3',
     'getTwiceItem': '../assets/sounds/getTwiceItem.mp3',
+    'finishLoad': '../assets/sounds/finishLoad.mp3',
   },
 };
 
@@ -133,8 +135,7 @@ phina.define('LoadingScene', {
     circle.tweener.clear()
     .setLoop(1)
     .to({scaleX: -1}, 900, "easeInOutCubic")
-    .to({scaleX: 1}, 900, "easeInOutCubic")
-    ;
+    .to({scaleX: 1}, 900, "easeInOutCubic");
     
     // ゲージ
     var gauge = phina.ui.Gauge({
@@ -156,7 +157,6 @@ phina.define('LoadingScene', {
 
       // 進行
       loader.onprogress = function(e) {
-       console.log(e)
        gauge.value = e.progress * 80;
       };
 
@@ -179,6 +179,7 @@ phina.define('LoadingScene', {
     // 全て終わったら
     phina.util.Flow.all(flows).then(function(args) {
 
+      SoundManager.play('finishLoad');
       //ゲージ即座に100％に
       gauge.animationTime = 1;
       gauge.value = 100;
@@ -560,28 +561,24 @@ phina.define('MainScene', {
     });
   }, 
   gameover: function() {
+    if (!isFinished) {
+      isFinished = true;
+      $("body").append("<div id='black-cover'></div>").hide().fadeIn(500);
+      $("#black-cover").append("<h1>GAME OVER</h1>").hide().fadeIn(1000);
+    }
     const self = this;
-    var label = Label({
-      text: 'GAME OVER',
-      fill: 'red',
-      fontSize: 100,
-      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
-    }).addChildTo(this);
-    label.setPosition(this.gridX.center(), this.blockGridY.center());
-    // 少し待ってからタイトル画面へ
-    label.tweener.clear()
-                 .wait(5000)
-                 .call(function() {
-                  if (!isSubmitted) {
-                    $("#hidden_form").append($("<input />", {
-                      type: 'hidden',
-                      name: 'score',
-                      value: score
-                    }));
-                    $("#hidden_form").submit();
-                    isSubmitted = true;
-                  }
-                 });
+    setTimeout(function() {
+      // 少し待ってからタイトル画面へ
+      if (!isSubmitted) {
+        $("#hidden_form").append($("<input />", {
+          type: 'hidden',
+          name: 'score',
+          value: score
+        }));
+        $("#hidden_form").submit();
+        isSubmitted = true;
+      }
+    }, 2000);
   },
   // 被らない場所に数字を出す
   makeNum: function(count) {
