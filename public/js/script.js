@@ -102,7 +102,7 @@ phina.define('LoadingScene', {
   init: function(options) {
     this.superInit(options);
     var self = this;
-    this.backgroundColor = "#F1E6EF";
+    this.backgroundColor = BACKGROUND_COLOR[1];
 
     // view
     var baseLayer = DisplayElement(options).addChildTo(this);
@@ -111,9 +111,10 @@ phina.define('LoadingScene', {
     var label = Label({
       text: "NOW LOADING...",
       fontFamily: "'Orbitron', 'MS ゴシック'",
+      fill: "white",
     })
     .addChildTo(baseLayer)
-    .setPosition(this.width*0.5, this.height*0.2)
+    .setPosition(this.width*0.5, this.height*0.25)
     label.tweener.clear()
     .setLoop(1)
     .to({alpha:0}, 500)
@@ -122,13 +123,13 @@ phina.define('LoadingScene', {
     
     // くるくるまわる円
     var circle = phina.display.CircleShape({
-      stroke: "#9467B7",
+      stroke: "white",
       fill: false,
       radius: 100,
       strokeWidth: 16,
     })
     .addChildTo(baseLayer)
-    .setPosition(this.width*0.5, this.height*0.4)
+    .setPosition(this.width*0.5, this.height*0.45)
     circle.tweener.clear()
     .setLoop(1)
     .to({scaleX: -1}, 900, "easeInOutCubic")
@@ -138,7 +139,8 @@ phina.define('LoadingScene', {
     // ゲージ
     var gauge = phina.ui.Gauge({
       value: 0,
-      gaugeColor: "#41E564",
+      gaugeColor: BACKGROUND_COLOR[2],
+      strokeWidth: 0,
     })
     .setPosition(this.width*0.5, this.height*0.75)
     .addChildTo(baseLayer);
@@ -182,7 +184,7 @@ phina.define('LoadingScene', {
       gauge.value = 100;
 
       // くるくる止める
-      circle.stroke = "#2BF439";
+      circle.stroke = BACKGROUND_COLOR[0];
       circle.tweener.clear()
       .to({scaleX: 1}, 350)
 
@@ -208,6 +210,7 @@ phina.define('LoadingScene', {
     });
   },
 });
+
 
 phina.define('MainScene', {
   superClass: 'DisplayScene',
