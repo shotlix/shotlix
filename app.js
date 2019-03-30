@@ -5,7 +5,7 @@ const http = require('http').Server(app);
 const PORT = process.env.PORT || 8000;
 const helmet = require('helmet');
 
-const DATABASE_URL = "postgres://awierqzkwwyumj:e6567e66d6c8c7e6311d317f8b9da41f1450a46f890f60b9792b9d6e4704a688@ec2-54-225-95-183.compute-1.amazonaws.com:5432/d52k7kfp7so72u"
+const DATABASE_URL = require('./database-url.config.json').database.url;
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize(DATABASE_URL, {
     dialect: 'postgres',
