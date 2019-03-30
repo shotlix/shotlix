@@ -4,23 +4,59 @@
 
 ## How to run
 
+### clone
+
 ```:sh
-# clone
 $ git clone git@github.com:shotlix/shotlix.git
 $ cd shotlix
+```
 
-# install package
+### local
+
+#### install package
+
+```:sh
 $ yarn install
+```
 
-# listen server (PORT: 8000)
+#### listen server (PORT: 8000)
+```:sh
 $ yarn start
+```
 
-# compile sass
+#### developing mode (open server, compile sass, and add prefix)
+```:sh
+$ yarn test
+```
+
+#### compile sass
+
+```:sh
 $ yarn scss
+```
 
-# add prefix
+#### add prefix
+```:sh
 $ yarn prefix
+```
 
-# open hotreload develop server
+#### open hotreload develop server
+
+```:sh
 $ yarn hot-dev-server
 ```
+
+### docker
+
+#### build
+
+```:docker
+$ docker build -t shotlix .
+```
+
+#### run
+
+```:docker
+$ docker run -p 8000:8000 -it shotlix
+```
+
