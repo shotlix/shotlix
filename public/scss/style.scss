@@ -88,11 +88,11 @@ input {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-#black-cover h1 {
-  color: white;
-  font-size: 80px;
-  font-family: 'Orbitron', 'MS ゴシック';
+  h1 {
+    color: white;
+    font-size: 80px;
+    font-family: 'Orbitron', 'MS ゴシック';
+  }
 }
 
 @media screen and (max-width:599px) {
