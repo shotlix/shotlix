@@ -6,9 +6,11 @@
   "license": "MIT",
   "scripts": {
     "start": "node app",
-    "scss": "node-sass --watch --include-path scss scss -o css --output-style compressed",
-    "prefix": "postcss --use autoprefixer --no-map scss -d css",
-    "hot-dev-server": "yarn run webpack-dev-server -- --inline --hot"
+    "scss": "node-sass --watch --include-path public/scss public/scss -o public/css --output-style compressed",
+    "prefix": "postcss --use autoprefixer --no-map public/css -d public/css",
+    "hot-dev-server": "yarn run webpack-dev-server -- --inline --hot",
+    "psql": "heroku pg:psql -a phina-game",
+    "test": "npm-run-all -p start scss prefix"
   },
   "dependencies": {
     "autoprefixer": "^9.5.0",
@@ -17,6 +19,7 @@
     "helmet": "^3.16.0",
     "node-sass": "^4.11.0",
     "node-sass-import": "^2.0.1",
+    "npm-run-all": "^4.1.5",
     "pg": "^7.9.0",
     "pg-hstore": "^2.3.2",
     "postcss": "^7.0.14",

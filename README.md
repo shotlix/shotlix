@@ -1,4 +1,4 @@
-# u18-game
+# shotlix
 
 ---
 
@@ -6,13 +6,13 @@
 
 ```:sh
 # clone
-$ git clone git@github.com:u18-game-con/u18-game.git
-$ cd u18-game
+$ git clone git@github.com:shotlix/shotlix.git
+$ cd shotlix
 
 # install package
 $ yarn install
 
-# listen server
+# listen server (PORT: 8000)
 $ yarn start
 
 # compile sass
