@@ -1,0 +1,5 @@
+{
+  "database":{
+    "url":"postgres://awierqzkwwyumj:e6567e66d6c8c7e6311d317f8b9da41f1450a46f890f60b9792b9d6e4704a688@ec2-54-225-95-183.compute-1.amazonaws.com:5432/d52k7kfp7so72u"
+  }
+}
