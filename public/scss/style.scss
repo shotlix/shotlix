@@ -80,7 +80,20 @@ input {
     height: 33vw;
   }
 }
-
+#black-cover {
+  width: 100%;
+  height: 100vh;
+  background-color: black;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  h1 {
+    color: white;
+    font-size: 80px;
+    font-family: 'Orbitron', 'MS ゴシック';
+  }
+}
 
 @media screen and (max-width:599px) {
   .top-container {
