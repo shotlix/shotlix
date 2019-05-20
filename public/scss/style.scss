@@ -1,5 +1,5 @@
 body {
-  background-color: #41404B;
+  background-color: #ACC3FF;
   overflow: hidden;
 }
 
@@ -7,10 +7,10 @@ input {
   font-size: 1.2rem;
   width: 250px;
   padding: 13px 0;
-  border-radius: 10px;
+  border-radius: 5px;
   -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   border: none;
   outline: none;
   text-align: center;
@@ -32,7 +32,7 @@ input {
     color: white;
   }
   &__name {
-    margin: 120px auto 30px auto;
+    margin: 150px auto 20px auto;
     display: block;
     &::-webkit-input-placeholder {
       font-weight: 300;
@@ -56,10 +56,16 @@ input {
     color: white;
     -webkit-transition: 0.3s;
     transition: 0.3s;
-    background-color: #73DAC1;
+    background-color: #545895;
     &:hover {
-      background-color: #07e2a3;
+      background-color: #484b7e;
     }
+  }
+  &__explain {
+    border-radius: 5px;
+    margin: 20px auto;
+    width: 250px;
+    padding: 16.5px 0;
   }
 }
 
@@ -71,11 +77,11 @@ input {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
   &__item {
     margin: 10px;
     border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: #7C90F9;
     width: 33vw;
     height: 33vw;
   }
