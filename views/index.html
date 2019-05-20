@@ -43,7 +43,11 @@
         <form action="/game" method="POST">
           <input class="top-container__name" type="text" placeholder="Enter your name" name="name" autocomplete="off">
           <input class="top-container__submit" type="submit" value="PLAY">
-          <div class="top-container__submit top-container__explain">操作説明</div>
+          <label>
+            <input class="top-container__explain__check" type="checkbox">
+            <div class="background"><img src="/assets/images/modal.png"></div>
+            <div class="top-container__submit top-container__explain">操作説明</div>
+          </label>
         </form>
       </div>
       <ul class="background-grid">

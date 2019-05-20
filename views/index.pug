@@ -47,7 +47,11 @@ html(lang="ja")
           form(action='/game' method='POST')
             input.top-container__name(type="text" placeholder="Enter your name" name='name' autocomplete="off")
             input.top-container__submit(type="submit" value="PLAY")
-            div.top-container__submit.top-container__explain 操作説明
+            label
+              input.top-container__explain__check(type="checkbox")
+              div.background
+                img(src="/assets/images/modal.png")
+              div.top-container__submit.top-container__explain 操作説明
       ul.background-grid
         li.background-grid__item
         li.background-grid__item
