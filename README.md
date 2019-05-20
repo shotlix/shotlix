@@ -1,5 +1,7 @@
 # shotlix
 
+<img src="https://github.com/kik-lab/shotlix/blob/master/public/assets/images/card.png?raw=true" width="100%" />
+
 ---
 
 ## How to run
