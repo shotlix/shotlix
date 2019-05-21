@@ -322,6 +322,7 @@ phina.define('MainScene', {
     time += app.deltaTime;
     // ポイント２倍期間が過ぎるとそれを止め、一定時間後にまた出す
     if (time-point_twice_start_time > POINT_TWICE_TIME && snake.isPointTwice) {
+      snake.fill = "white";
       snake.isPointTwice = false;
       point_twice_start_time = time;
       setTimeout(function() {
