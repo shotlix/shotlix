@@ -14,7 +14,9 @@ const BLOCK_SIZE = 55,
       ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
       BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの間隔
       POINT_TWICE_EVENT_RANGE = 45000, //ポイント２倍アイテムを出すイベントの間隔
+      BULLET_FOUR_EVENT_RANGE = 37500, //銃弾4つになるアイテムを出すイベントの感覚
       POINT_TWICE_TIME = 10000, //ポイントが２倍になる時間
+      BULLET_FOUR_TIME = 7000, //銃弾が4つになる時間
       BULLET_PLUS = 5,
       NUM_STRICT = 7, // 一度に出る数字の個数
       direction_array = ['right', 'up', 'left', 'down'],
@@ -31,10 +33,11 @@ let game_array = [], // フィールドの二次元配列
     rod_start_position = [], //邪魔する棒を出すときの位置を格納する
     before_rod_event_time = 0, // 前回棒を出した時刻
     before_bullet_event_time = 0,
-    canNumWrite = true;
-    point_twice_start_time = 0;
-    score = 0;
-    isSubmitted = false;
+    canNumWrite = true,
+    point_twice_start_time = 0,
+    bullet_four_start_time = 0,
+    score = 0,
+    isSubmitted = false,
     isFinished = false;
 
 //よく使う関数を定義
@@ -85,6 +88,7 @@ const ASSETS = {
   image: {
     'bulletItem': '../assets/images/bulletItem.png',
     'pointTwiceItem': '../assets/images/pointTwiceItem.png',
+    'bulletFourItem': '../assets/images/bulletFourItem.png',
   },
   sound: {
     'getBullet': '../assets/sounds/getBullet.mp3',
@@ -95,6 +99,7 @@ const ASSETS = {
     'rodEvent': '../assets/sounds/rodEvent.mp3',
     'getTwiceItem': '../assets/sounds/getTwiceItem.mp3',
     'finishLoad': '../assets/sounds/finishLoad.mp3',
+    'getBulletFourItem': '../assets/sounds/getBulletFourItem.mp3'
   },
 };
 
@@ -309,7 +314,11 @@ phina.define('MainScene', {
     //点数２倍アイテムを作成
     setTimeout(function() {
       self.makePointTwiceItem();
-    }, 20000)
+    }, 20000);
+
+    setTimeout(function() {
+      self.makeBulletFourItem();
+    }, 15000);
 
     //銃弾のタイマー
     this.bulletTimer = 0; 
@@ -328,6 +337,14 @@ phina.define('MainScene', {
       setTimeout(function() {
         self.makePointTwiceItem();
       }, POINT_TWICE_EVENT_RANGE);
+    }
+    if (time-bullet_four_start_time > BULLET_FOUR_TIME && snake.isBulletFour) {
+      snake.fill = "white";
+      snake.isBulletFour = false;
+      bullet_four_start_time = time;
+      setTimeout(function() {
+        self.makeBulletFourItem();
+      }, BULLET_FOUR_EVENT_RANGE);
     }
     // 前回棒を出した時刻から一定時間経つと棒を出すイベントを発火
     if (time-before_rod_event_time > ROD_EVENT_RANGE) {
@@ -446,6 +463,21 @@ phina.define('MainScene', {
                                        point_twice_start_time = time;
                                      });
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 300 && !snake.isDead) {
+          SoundManager.play('getBulletFourItem');
+          snake.fill = "red";
+          self.bulletFourItem.tweener.clear()
+                                     .to({
+                                       scaleX: 0.1,
+                                       scaleY: 0.1,
+                                       rotation: 360
+                                     }, 500)
+                                     .call(function() {
+                                       snake.isBulletFour = true;
+                                       self.bulletFourItem.remove();
+                                       bullet_four_start_time = time;
+                                     });
+          game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
         } else if (!snake.isDead) {
           if (game_array[snake.livePosition[1]][snake.livePosition[0]] !== 0) {
             if (snake.isPointTwice) {
@@ -524,13 +556,25 @@ phina.define('MainScene', {
     //ここから銃弾の処理
     this.bulletTimer += app.deltaTime;
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
-      SoundManager.play('shotBullet');
-      const bullet = Bullet().addChildTo(this.bulletGroup)
-      bullet.direction = snake.beforedirection;
-      bullet.setPosition(snake.x, snake.y);
-      snake.bullets--;
-      this.bulletLabel.text = snake.bullets;
-      this.bulletTimer = 0;
+      if (snake.isBulletFour) {
+        SoundManager.play('shotBullet');
+        for (let i=0; i<4; i++) {
+          let bullet = Bullet().addChildTo(this.bulletGroup);
+          bullet.direction = direction_array[i];
+          bullet.setPosition(snake.x, snake.y);
+        }
+        snake.bullet--;
+        this.bulletLabel.text = snake.bullets;
+        this.bulletTimer = 0;
+      } else {
+        SoundManager.play('shotBullet');
+        const bullet = Bullet().addChildTo(this.bulletGroup)
+        bullet.direction = snake.beforedirection;
+        bullet.setPosition(snake.x, snake.y);
+        snake.bullets--;
+        this.bulletLabel.text = snake.bullets;
+        this.bulletTimer = 0;
+      }
     }
     this.bulletGroup.children.some(function(bullet) {
       switch (bullet.direction) {
@@ -674,6 +718,19 @@ phina.define('MainScene', {
                                                  .setPosition(this.blockGridX.span(pointTwiceItemPosition[0]), this.blockGridY.span(pointTwiceItemPosition[1]));
     game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] = 200;
     this.pointTwiceItem = pointTwiceItem;
+  },
+  makeBulletFourItem: function() {
+    let bulletFlag = true;
+    let bulletFourItemPosition = [];
+    while (bulletFlag) {
+      bulletFourItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
+      if (game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] === 0 || game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] === -1) {
+        bulletFlag = false;
+      }
+    }
+    let bulletFourItem = Sprite('bulletFourItem').addChildTo(this).setPosition(this.blockGridX.span(bulletFourItemPosition[0]), this.blockGridY.span(bulletFourItemPosition[1]));
+    game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] = 300;
+    this.bulletFourItem = bulletFourItem;
   }
 });
 
@@ -718,6 +775,7 @@ phina.define('Snake', {
     this.score = 0;
     this.isDead = false;
     this.isPointTwice = false;
+    this.isBulletFour = false;
   }
 });
 
