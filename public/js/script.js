@@ -432,6 +432,7 @@ phina.define('MainScene', {
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
         } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 200 && !snake.isDead) {
           SoundManager.play('getTwiceItem');
+          snake.fill = "yellow";
           self.pointTwiceItem.tweener.clear()
                                      .to({
                                        scaleX: 0.1,
@@ -523,7 +524,7 @@ phina.define('MainScene', {
     this.bulletTimer += app.deltaTime;
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       SoundManager.play('shotBullet');
-      const bullet = Bullet(snake.fill).addChildTo(this.bulletGroup)
+      const bullet = Bullet().addChildTo(this.bulletGroup)
       bullet.direction = snake.beforedirection;
       bullet.setPosition(snake.x, snake.y);
       snake.bullets--;
@@ -721,11 +722,11 @@ phina.define('Snake', {
 
 phina.define('Bullet', {
   superClass: 'RectangleShape',
-  init: function(color) {
+  init: function() {
     this.superInit({
       width: BULLET_SIZE,
       height: BULLET_SIZE,
-      fill: color,
+      fill: "white",
       strokeWidth: 2,
       stroke: "black"
     });
