@@ -37,9 +37,20 @@ html(lang="ja")
   body
     header
       a(href="/")
-        i(class="far fa-arrow-alt-circle-left")
-      h1 RANKING
-    main
+        img(src="/assets/images/back.png")
+
+    div.container
+      h1 Your Score
+      .ranking-container.Score__Log
+          .ranking
+            .ranking-left
+              i.fas.fa-crown
+              p 1
+            .ranking-center
+              h2.name aa
+            .ranking-right
+              p 111
+      h1 Ranking
       .ranking-container
         each rank in ranking
           .ranking
