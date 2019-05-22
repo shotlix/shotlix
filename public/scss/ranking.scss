@@ -1,67 +1,53 @@
 body {
   margin: 0;
-  background-color: #FF837B;
+  background-color: #7C90F9;
   font-family: 'Orbitron', 'MS ゴシック';
 }
-header {
-  height: 150px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+header img {
+  width: 80px;
+  position: fixed;
+  top: 20px;
+  left: 40px;
 }
-header i {
-  position: relative;
-    right: 430px;
-    bottom: 10px;
-  font-size: 40px;
+.Score__Log {
+  margin-bottom: 60px;
 }
-header h1 {
-  font-size: 60px;
+.container h1 {
+  text-align: center;
+  font-weight: 200;
+  font-size: 3rem;
   color: white;
-}
-main {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
 }
 .ranking {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  width: 800px;
+  -ms-flex-align: center;
+  align-items: center;
+  max-width: 800px;
+  width: calc(100vw - 60px);
   height: 88px;
-  background-color: white;
-  border-radius: 12px;
-  color: #FF837B;
-  margin-bottom: 25px;
+  background-color: #545895;
+  border-radius: 5px;
+  color: white;
+  margin:  0 auto 25px auto;
 }
 .ranking-left {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  width: 30%;
+  -ms-flex-align: center;
+  align-items: center;
+  width: 20%;
 }
 .ranking-left i {
   font-size: 25px;
   position: relative;
-      left: 20px;
-      bottom: 3px;
-  width: 30%;
+  left: 20px;
+  bottom: 3px;
+  width: 45%;
 }
 .ranking-left p {
   font-size: 36px;
@@ -70,7 +56,7 @@ main {
   width: 50%
 }
 .ranking-center h2 {
-  font-weight: 900;
+  font-weight: 200;
   font-size: 45px;
 }
 .ranking-right {
