@@ -33,12 +33,12 @@ let game_array = [], // フィールドの二次元配列
     rod_start_position = [], //邪魔する棒を出すときの位置を格納する
     before_rod_event_time = 0, // 前回棒を出した時刻
     before_bullet_event_time = 0,
-    canNumWrite = true,
+    can_num_write = true,
     point_twice_start_time = 0,
     bullet_four_start_time = 0,
     score = 0,
-    isSubmitted = false,
-    isFinished = false;
+    is_submitted = false,
+    is_finished = false;
 
 //よく使う関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
@@ -607,22 +607,22 @@ phina.define('MainScene', {
     });
   }, 
   gameover: function() {
-    if (!isFinished) {
-      isFinished = true;
+    if (!is_finished) {
+      is_finished = true;
       $("body").append("<div id='black-cover'></div>").hide().fadeIn(500);
       $("#black-cover").append("<h1>GAME OVER</h1>").hide().fadeIn(1000);
     }
     const self = this;
     setTimeout(function() {
       // 少し待ってからタイトル画面へ
-      if (!isSubmitted) {
+      if (!is_submitted) {
         $("#hidden_form").append($("<input />", {
           type: 'hidden',
           name: 'score',
           value: score
         }));
         $("#hidden_form").submit();
-        isSubmitted = true;
+        is_submitted = true;
       }
     }, 2000);
   },
@@ -633,11 +633,11 @@ phina.define('MainScene', {
       for (j=0; j<num_position_array.length; j++) {
         if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
             i -= 1;
-            canNumWrite = false;
+            can_num_write = false;
         }
       }
-      if (!canNumWrite) {
-        canNumWrite = true;
+      if (!can_num_write) {
+        can_num_write = true;
         continue;
       }
       num_position_array.push([numPositionX, numPositionY]);
