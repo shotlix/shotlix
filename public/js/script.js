@@ -70,10 +70,10 @@ const createSnakeInfo = () => {
 for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
   for (let j=0; j<GRID_NUM_X; j++) {
-    if (i === 0 || i === GRID_NUM_Y-1 || i === 1) {
+    if (i == 0 || i == GRID_NUM_Y-1 || i == 1) {
       game_array_element.push(null);
     } else {
-      if (j === 0 || j === GRID_NUM_X-1) {
+      if (j == 0 || j == GRID_NUM_X-1) {
         game_array_element.push(null);
       } else {
         game_array_element.push(0);
@@ -241,11 +241,11 @@ phina.define('MainScene', {
     let numGroup = DisplayElement().addChildTo(this);
     for (i=0; i<GRID_NUM_Y; i++) {
       for (j=0; j<GRID_NUM_X; j++) {
-        if (i === 0 || i === GRID_NUM_Y-1 || i === 1) {
+        if (i == 0 || i == GRID_NUM_Y-1 || i == 1) {
           Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
         } else {
-          if (j === 0 || j === GRID_NUM_X-1) {
+          if (j == 0 || j == GRID_NUM_X-1) {
             Block("transparent", j, i).addChildTo(blockGroup)
                       .setPosition(blockGridX.span(j), blockGridY.span(i));
           } else {
@@ -348,7 +348,7 @@ phina.define('MainScene', {
     }
     // 前回棒を出した時刻から一定時間経つと棒を出すイベントを発火
     if (time-before_rod_event_time > ROD_EVENT_RANGE) {
-      if (time % 2 === 0) {
+      if (time % 2 == 0) {
         rod_start_position = [0, randRange(2, GRID_NUM_Y-2)];
       } else {
         rod_start_position = [randRange(1, GRID_NUM_X-2), 1];
@@ -365,10 +365,10 @@ phina.define('MainScene', {
           this.flash(adviceRightCircle);
           setTimeout(function() {
             self.blockGroup.children.some(function(block) {
-              if (block.blockPosition[1] === rod_start_position[1] && 
+              if (block.blockPosition[1] == rod_start_position[1] && 
                   block.blockPosition[0] !== 0 && 
                   block.blockPosition[0] !== GRID_NUM_X-1) {
-                if (game_array[rod_start_position[1]][block.blockPosition[0]] === 0 && game_array[rod_start_position[1]][block.blockPosition[0]] !== 100) {
+                if (game_array[rod_start_position[1]][block.blockPosition[0]] == 0 && game_array[rod_start_position[1]][block.blockPosition[0]] !== 100) {
                   game_array[rod_start_position[1]][block.blockPosition[0]] = -1;
                 }
                 block.fill = BLOCK_COLOR;
@@ -388,11 +388,11 @@ phina.define('MainScene', {
           this.flash(adviceUnderCircle);
           setTimeout(function() {
             self.blockGroup.children.some(function(block) {
-              if (block.blockPosition[0] === rod_start_position[0] && 
+              if (block.blockPosition[0] == rod_start_position[0] && 
                   block.blockPosition[1] !== 0 && 
                   block.blockPosition[1] !== GRID_NUM_Y-1 &&
                   block.blockPosition[1] !== 1) {
-                if (game_array[block.blockPosition[1]][rod_start_position[0]] === 0 && game_array[block.blockPosition[1]][rod_start_position[0]] !== 100) {
+                if (game_array[block.blockPosition[1]][rod_start_position[0]] == 0 && game_array[block.blockPosition[1]][rod_start_position[0]] !== 100) {
                   game_array[block.blockPosition[1]][rod_start_position[0]] = -1;
                 }
                 block.fill = BLOCK_COLOR;
@@ -407,7 +407,7 @@ phina.define('MainScene', {
     snake.moveBy(snake.speed[0], snake.speed[1]);
     this.blockGroup.children.some(function(block) {
       //snakeとblockが重なった場合の処理
-      if (snake.x === block.x && snake.y === block.y) {
+      if (snake.x == block.x && snake.y == block.y) {
         //前のブロックから進んだ方向をbeforedirectionで取得し、位置に反映させる
         switch (snake.beforedirection) {
           case 'right':
@@ -424,14 +424,14 @@ phina.define('MainScene', {
             break;
         }
         //場外に出た時
-        if (game_array[snake.livePosition[1]][snake.livePosition[0]] === null || block.fill === BLOCK_COLOR) {
+        if (game_array[snake.livePosition[1]][snake.livePosition[0]] == null || block.fill == BLOCK_COLOR) {
           if (!snake.isDead) {
             SoundManager.play('dead');
           }
           score = snake.score;
           self.killSnake(snake);
           self.gameover();
-        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 100 && !snake.isDead) {
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] == 100 && !snake.isDead) {
           SoundManager.play('getBullet');
           snake.bullets += BULLET_PLUS;
           self.bulletLabel.text = snake.bullets;
@@ -448,7 +448,7 @@ phina.define('MainScene', {
                                    self.bulletItem.remove();
                                  });
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
-        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 200 && !snake.isDead) {
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] == 200 && !snake.isDead) {
           SoundManager.play('getTwiceItem');
           snake.fill = "yellow";
           self.pointTwiceItem.tweener.clear()
@@ -463,7 +463,7 @@ phina.define('MainScene', {
                                        point_twice_start_time = time;
                                      });
           game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
-        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] === 300 && !snake.isDead) {
+        } else if (game_array[snake.livePosition[1]][snake.livePosition[0]] == 300 && !snake.isDead) {
           SoundManager.play('getBulletFourItem');
           snake.fill = "red";
           self.bulletFourItem.tweener.clear()
@@ -505,7 +505,7 @@ phina.define('MainScene', {
             game_array[snake.livePosition[1]][snake.livePosition[0]] = 0;
           }
           self.numGroup.children.some(function(num) {
-            if (num.num_position_array[0] === snake.livePosition[0] && num.num_position_array[1] === snake.livePosition[1]) {
+            if (num.num_position_array[0] == snake.livePosition[0] && num.num_position_array[1] == snake.livePosition[1]) {
               num.tweener.clear()
                          .to({
                            scaleX: 0.1,
@@ -594,8 +594,8 @@ phina.define('MainScene', {
       self.blockGroup.children.some(function(block) {
         if (Math.abs(bullet.x-block.x) < BLOCK_SIZE/4*3 && Math.abs(bullet.y-block.y) < BLOCK_SIZE/4*3 && 
             block.blockPosition[0] !== 0 && block.blockPosition[1] !== 0 && block.blockPosition[0] !== GRID_NUM_X-1 && block.blockPosition[1] !== GRID_NUM_Y-1 &&
-            block.fill === BLOCK_COLOR) {
-          if (game_array[block.blockPosition[1]][block.blockPosition[0]] === -1) {
+            block.fill == BLOCK_COLOR) {
+          if (game_array[block.blockPosition[1]][block.blockPosition[0]] == -1) {
             game_array[block.blockPosition[1]][block.blockPosition[0]] = 0;
           }
           block.fill = BACKGROUND_COLOR[0];
@@ -631,10 +631,14 @@ phina.define('MainScene', {
     for (i=0; i<count; i++) {
       let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
       for (j=0; j<num_position_array.length; j++) {
-        if (numPositionX === num_position_array[j][0] && numPositionY === num_position_array[j][1]) {
+        if (numPositionX == num_position_array[j][0] && numPositionY == num_position_array[j][1]) {
             i -= 1;
             can_num_write = false;
         }
+      }
+      if (game_array[numPositionY][numPositionX] == 100 | game_array[numPositionY][numPositionX] == 200 || game_array[numPositionY][numPositionX] == 300) {
+        i -= 1;
+        can_num_write = false;
       }
       if (!can_num_write) {
         can_num_write = true;
@@ -696,7 +700,7 @@ phina.define('MainScene', {
     let bulletItemPosition = []
     while (bulletFlag) {
       bulletItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
-      if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] === 0 || game_array[bulletItemPosition[1]][bulletItemPosition[0]] === -1) {
+      if (game_array[bulletItemPosition[1]][bulletItemPosition[0]] == 0 || game_array[bulletItemPosition[1]][bulletItemPosition[0]] == -1) {
         bulletFlag = false; 
       }
     }
@@ -710,7 +714,7 @@ phina.define('MainScene', {
     let pointTwiceItemPosition = []
     while (pointFlag) {
       pointTwiceItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
-      if (game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] === 0 || game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] === -1) {
+      if (game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] == 0 || game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] == -1) {
         pointFlag = false; 
       }
     }
@@ -724,7 +728,7 @@ phina.define('MainScene', {
     let bulletFourItemPosition = [];
     while (bulletFlag) {
       bulletFourItemPosition = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
-      if (game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] === 0 || game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] === -1) {
+      if (game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] == 0 || game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] == -1) {
         bulletFlag = false;
       }
     }
