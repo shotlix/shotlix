@@ -563,7 +563,7 @@ phina.define('MainScene', {
           bullet.direction = direction_array[i];
           bullet.setPosition(snake.x, snake.y);
         }
-        snake.bullet--;
+        snake.bullets--;
         this.bulletLabel.text = snake.bullets;
         this.bulletTimer = 0;
       } else {
