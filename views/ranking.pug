@@ -45,11 +45,11 @@ html(lang="ja")
           .ranking
             .ranking-left
               i.fas.fa-crown
-              p 1
+              p #{myRank.rank}
             .ranking-center
-              h2.name aa
+              h2.name #{myRank.name}
             .ranking-right
-              p 111
+              p #{myRank.score}
       h1 Ranking
       .ranking-container
         each rank in ranking

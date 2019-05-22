@@ -43,7 +43,7 @@ app.get('/', function(req, res, next){
     });
 });
 
-app.post('/', function(req, res, next) {
+app.post('/ranking', (req, res, next) => {
     const name = req.body.name.slice(0, 10);
     const score = parseInt(req.body.score);
     Ranking.create({
@@ -51,27 +51,31 @@ app.post('/', function(req, res, next) {
         score: score,
         createdAt: new Date()
     }).then(() => {
-        res.redirect('/ranking');
-    });
-});
-
-app.get('/ranking', function(req, res, next) {
-    Ranking.findAll().then((ranking) => {
-        ranking.sort((a, b) => {
-            if (a.score > b.score) return -1;
-            if (a.score < b.score) return 1;
-            return 0;
-        });
-        let count = 1;
-        ranking.forEach(function(rank) {
-            rank.rank = count;
-            count++;
-        });
-        res.render('ranking', {
-            isPlayed: true,
-            name: req.body.name,
-            score: req.body.score,
-            ranking: ranking,
+        Ranking.findAll().then((ranking) => {
+            ranking.sort((a, b) => {
+                if (a.score > b.score) return -1;
+                if (a.score < b.score) return 1;
+                return 0;
+            });
+            ranking[0].rank = 1;
+            let duplicatedNum = 0;
+            let myRank = 1;
+            for (let i=1; i<ranking.length; i++) {
+                if (ranking[i].score < ranking[i-1].score) {
+                    ranking[i].rank = ranking[i-1].rank+duplicatedNum+1;
+                    duplicatedNum = 0;
+                } else {
+                    ranking[i].rank = ranking[i-1].rank;
+                    duplicatedNum++;
+                }
+                if (ranking[i].score == score) {
+                    myRank = ranking[i].rank;
+                }
+            }
+            res.render('ranking', {
+                myRank: ranking[myRank],
+                ranking: ranking
+            });
         });
     });
 });
