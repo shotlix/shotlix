@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const router = express.Router();
 const http = require('http').Server(app);
 const PORT = process.env.PORT || 8000;
 const helmet = require('helmet');
@@ -38,9 +37,7 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.set('view engine', 'pug');
 
 app.get('/', function(req, res, next){
-    res.render('index', {
-        isPlayed: false,
-    });
+    res.render('index');
 });
 
 app.post('/ranking', (req, res, next) => {
@@ -57,23 +54,27 @@ app.post('/ranking', (req, res, next) => {
                 if (a.score < b.score) return 1;
                 return 0;
             });
-            ranking[0].rank = 1;
             let duplicatedNum = 0;
-            let myRank = 1;
-            for (let i=1; i<ranking.length; i++) {
-                if (ranking[i].score < ranking[i-1].score) {
-                    ranking[i].rank = ranking[i-1].rank+duplicatedNum+1;
-                    duplicatedNum = 0;
+            ranking[0].rank = 1;
+            let myRankId = 0;
+            for (let i=0; i<ranking.length; i++) {
+                if (i == 0) {
+                    ranking[i].rank = 1;
                 } else {
-                    ranking[i].rank = ranking[i-1].rank;
-                    duplicatedNum++;
+                    if (ranking[i].score < ranking[i-1].score) {
+                        ranking[i].rank = ranking[i-1].rank+duplicatedNum+1;
+                        duplicatedNum = 0;
+                    } else {
+                        ranking[i].rank = ranking[i-1].rank;
+                        duplicatedNum++;
+                    }
                 }
-                if (ranking[i].score == score) {
-                    myRank = ranking[i].rank;
+                if (name == ranking[i].name && score == ranking[i].score) {
+                    myRankId = i;
                 }
             }
             res.render('ranking', {
-                myRank: ranking[myRank],
+                myRank: ranking[myRankId],
                 ranking: ranking
             });
         });
