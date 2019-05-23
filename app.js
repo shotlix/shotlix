@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const router = express.Router();
 const http = require('http').Server(app);
 const PORT = process.env.PORT || 8000;
 const helmet = require('helmet');
@@ -38,12 +37,10 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.set('view engine', 'pug');
 
 app.get('/', function(req, res, next){
-    res.render('index', {
-        isPlayed: false,
-    });
+    res.render('index');
 });
 
-app.post('/', function(req, res, next) {
+app.post('/ranking', (req, res, next) => {
     const name = req.body.name.slice(0, 10);
     const score = parseInt(req.body.score);
     Ranking.create({
@@ -51,27 +48,35 @@ app.post('/', function(req, res, next) {
         score: score,
         createdAt: new Date()
     }).then(() => {
-        res.redirect('/ranking');
-    });
-});
-
-app.get('/ranking', function(req, res, next) {
-    Ranking.findAll().then((ranking) => {
-        ranking.sort((a, b) => {
-            if (a.score > b.score) return -1;
-            if (a.score < b.score) return 1;
-            return 0;
-        });
-        let count = 1;
-        ranking.forEach(function(rank) {
-            rank.rank = count;
-            count++;
-        });
-        res.render('ranking', {
-            isPlayed: true,
-            name: req.body.name,
-            score: req.body.score,
-            ranking: ranking,
+        Ranking.findAll().then((ranking) => {
+            ranking.sort((a, b) => {
+                if (a.score > b.score) return -1;
+                if (a.score < b.score) return 1;
+                return 0;
+            });
+            let duplicatedNum = 0;
+            ranking[0].rank = 1;
+            let myRankId = 0;
+            for (let i=0; i<ranking.length; i++) {
+                if (i == 0) {
+                    ranking[i].rank = 1;
+                } else {
+                    if (ranking[i].score < ranking[i-1].score) {
+                        ranking[i].rank = ranking[i-1].rank+duplicatedNum+1;
+                        duplicatedNum = 0;
+                    } else {
+                        ranking[i].rank = ranking[i-1].rank;
+                        duplicatedNum++;
+                    }
+                }
+                if (name == ranking[i].name && score == ranking[i].score) {
+                    myRankId = i;
+                }
+            }
+            res.render('ranking', {
+                myRank: ranking[myRankId],
+                ranking: ranking
+            });
         });
     });
 });

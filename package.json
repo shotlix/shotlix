@@ -15,6 +15,7 @@
   "dependencies": {
     "autoprefixer": "^9.5.0",
     "body-parser": "^1.18.3",
+    "csurf": "^1.10.0",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
     "node-sass": "^4.11.0",
