@@ -9,6 +9,22 @@ header img {
   top: 20px;
   left: 40px;
 }
+
+.twitter-share{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  display: block;
+  background-color: white;
+  img {
+    margin: 20px 0 10px 18px;
+    width: 20px;
+    height: 20px;
+  }
+}
 .Score__Log {
   margin-bottom: 60px;
 }
@@ -31,7 +47,7 @@ header img {
   background-color: #545895;
   border-radius: 5px;
   color: white;
-  margin:  0 auto 25px auto;
+  margin:  0 auto 5px auto;
 }
 .ranking-left {
   display: -webkit-box;
