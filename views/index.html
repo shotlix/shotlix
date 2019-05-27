@@ -24,8 +24,8 @@
   <link rel="shortcut icon" href="https://shotlix.herokuapp.com/assets/images/favicon.png">
   <!-- Title-->
   <title>shotlix</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120739547-7"></script>
@@ -36,6 +36,7 @@
       dataLayer.push(arguments);
     }
     gtag('js', new Date());
+
     gtag('config', 'UA-120739547-7');
   </script>
 
@@ -43,7 +44,9 @@
 
 <body>
   <div class="container">
-    <div class="top-container">
+    <div class="top-container"><a class="twitter-share"
+        href="https://twitter.com/share?url=https://shotlix.herokuapp.com/&amp;text=shotlix/パズルシューティングゲーム"
+        target="_blank" data-show-count="false"><img src="/assets/images/share-alt-light.svg"></a>
       <h1 class="top-container__ttl">shotlix</h1>
       <form action="/game" method="POST">
         <input class="top-container__name" type="text" placeholder="Enter your name" name="name" autocomplete="off">
@@ -75,6 +78,27 @@
       <li class="background-grid__item"></li>
       <li class="background-grid__item"></li>
     </ul>
+  </div>
+  <ul class="background-grid">
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+    <li class="background-grid__item"></li>
+  </ul>
   </div>
 </body>
 
