@@ -49,11 +49,15 @@ app.post('/ranking', (req, res, next) => {
         score: score,
         createdAt: date
     }).then(() => {
-        res.redirect('/ranking?name='+name+'&score='+String(score));
+        const nameBuffer = new Buffer(name);
+        const scoreBuffer = new Buffer(String(score));
+        res.redirect('/ranking?name='+nameBuffer.toString('base64')+'&score='+scoreBuffer.toString('base64'));
     });
 });
 
 app.get('/ranking', (req, res, next) => {
+    const name = new Buffer(req.query.name, 'base64').toString('utf-8');
+    const score = new Buffer(req.query.score, 'base64').toString('utf-8');
     Ranking.findAll().then((ranking) => {
         ranking.sort((a, b) => {
             if (a.score > b.score) return -1;
@@ -75,7 +79,7 @@ app.get('/ranking', (req, res, next) => {
                     duplicatedNum++;
                 }
             }
-            if (req.query.name == ranking[i].name && parseInt(req.query.score) == ranking[i].score) {
+            if (name == ranking[i].name && score == ranking[i].score) {
                 myRankId = i;
             }
         }
