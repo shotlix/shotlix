@@ -23,8 +23,8 @@ html(lang="ja")
     link(rel="shortcut icon" href="https://shotlix.herokuapp.com/assets/images/favicon.png")
     // Title
     title shotlix
-    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css")
     link(rel="stylesheet" href="./css/style.css")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css")
     link(href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet")
     // Global site tag (gtag.js) - Google Analytics
     script(async="" src="https://www.googletagmanager.com/gtag/js?id=UA-120739547-7")
@@ -37,6 +37,8 @@ html(lang="ja")
   body
     .container
       .top-container
+        a.twitter-share(href="https://twitter.com/share?url=https://shotlix.herokuapp.com/&text=shotlix/パズルシューティングゲーム" target="_blank" data-show-count="false")
+          img(src="/assets/images/share-alt-light.svg")
         h1.top-container__ttl shotlix
         if isPlayed
           h2 Your score was #{score}

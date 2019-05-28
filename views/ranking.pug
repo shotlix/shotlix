@@ -37,7 +37,8 @@ html(lang="ja")
     header
       a(href="/")
         img(src="/assets/images/back.png")
-
+    a.twitter-share(href="https://twitter.com/share?&hashtags=shotlix&url=https://shotlix.herokuapp.com/&text=" + myRank.score + "スコアを獲得し、" + myRank.rank + "位でした。" target="_blank" data-show-count="false")
+      img(src="/assets/images/share-alt-light.svg")
     div.container
       h1 Your Score
       .ranking-container.Score__Log
