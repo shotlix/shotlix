@@ -52,43 +52,61 @@ app.post('/ranking', (req, res, next) => {
         const nameBuffer = new Buffer(name);
         const scoreBuffer = new Buffer(String(score));
         res.redirect('/ranking?name='+nameBuffer.toString('base64')+'&score='+scoreBuffer.toString('base64'));
+    }).catch((err) => {
+        const error = "データが生成できませんでした";
+        error.status = 500;
+        next(error);
     });
 });
 
 app.get('/ranking', (req, res, next) => {
-    const name = new Buffer(req.query.name, 'base64').toString('utf-8');
-    const score = new Buffer(req.query.score, 'base64').toString('utf-8');
-    Ranking.findAll().then((ranking) => {
-        ranking.sort((a, b) => {
-            if (a.score > b.score) return -1;
-            if (a.score < b.score) return 1;
-            return 0;
-        });
-        let duplicatedNum = 0;
-        ranking[0].rank = 1;
-        let myRankId = 0;
-        for (let i=0; i<ranking.length; i++) {
-            if (i == 0) {
-                ranking[i].rank = 1;
-            } else {
-                if (ranking[i].score < ranking[i-1].score) {
-                    ranking[i].rank = ranking[i-1].rank+duplicatedNum+1;
-                    duplicatedNum = 0;
+    const name = req.query.name ? new Buffer(req.query.name, 'base64').toString('utf-8') : "";
+    const score = req.query.score ? new Buffer(req.query.score, 'base64').toString('utf-8') : "";
+    if (name == "" && score == "") {
+        res.redirect("/");
+    } else {
+        Ranking.findAll().then((ranking) => {
+            ranking.sort((a, b) => {
+                if (a.score > b.score) return -1;
+                if (a.score < b.score) return 1;
+                return 0;
+            });
+            let duplicatedNum = 0;
+            ranking[0].rank = 1;
+            let myRankId = 0;
+            let isExist = false;
+            for (let i=0; i<ranking.length; i++) {
+                if (i == 0) {
+                    ranking[i].rank = 1;
                 } else {
-                    ranking[i].rank = ranking[i-1].rank;
-                    duplicatedNum++;
+                    if (ranking[i].score < ranking[i-1].score) {
+                        ranking[i].rank = ranking[i-1].rank+duplicatedNum+1;
+                        duplicatedNum = 0;
+                    } else {
+                        ranking[i].rank = ranking[i-1].rank;
+                        duplicatedNum++;
+                    }
+                }
+                if (name == ranking[i].name && score == ranking[i].score) {
+                    myRankId = i;
+                    isExist = true;
                 }
             }
-            if (name == ranking[i].name && score == ranking[i].score) {
-                myRankId = i;
+            if (isExist) {
+                res.render('ranking', {
+                    myRank: ranking[myRankId],
+                    ranking: ranking
+                });
+            } else {
+                res.redirect("/");
             }
-        }
-        res.render('ranking', {
-            myRank: ranking[myRankId],
-            ranking: ranking
+        }).catch((err) => {
+            const error = new Error("何らかのエラーが起きました");
+            error.status = 404;
+            next(error);
         });
-    });
-})
+    }
+});
 
 app.post('/game', function(req, res, next) {
     res.render('game', {
