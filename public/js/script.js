@@ -10,15 +10,15 @@ const BLOCK_SIZE = 55,
       SNAKE_SIZE = 20,
       BULLET_SPEED = 10,
       BULLET_SIZE = 10,
-      NUM_EVENT_RANGE = 2000, // 数字を出すイベントの間隔
-      ROD_EVENT_RANGE = 5000, // 棒を出すイベントの間隔
-      BULLET_EVENT_RANGE = 30000, //銃弾補充アイテムを出すイベントの間隔
-      POINT_TWICE_EVENT_RANGE = 45000, //ポイント２倍アイテムを出すイベントの間隔
-      BULLET_FOUR_EVENT_RANGE = 37500, //銃弾4つになるアイテムを出すイベントの感覚
-      POINT_TWICE_TIME = 10000, //ポイントが２倍になる時間
-      BULLET_FOUR_TIME = 7000, //銃弾が4つになる時間
+      NUM_EVENT_RANGE = 2000, // 数字を出すイベント�?�間隔
+      ROD_EVENT_RANGE = 5000, // 棒を出すイベント�?�間隔
+      BULLET_EVENT_RANGE = 30000, //�?弾補�??アイ�?�?を�?�すイベント�?�間隔
+      POINT_TWICE_EVENT_RANGE = 45000, //ポイント２倍アイ�?�?を�?�すイベント�?�間隔
+      BULLET_FOUR_EVENT_RANGE = 37500, //�?弾4つになるアイ�?�?を�?�すイベント�?�感�?
+      POINT_TWICE_TIME = 10000, //ポイントが?��倍になる時�?
+      BULLET_FOUR_TIME = 7000, //�?弾�?4つになる時�?
       BULLET_PLUS = 5,
-      NUM_STRICT = 7, // 一度に出る数字の個数
+      NUM_STRICT = 7, // 一度に出る数字�?�個数
       direction_array = ['right', 'up', 'left', 'down'],
       MY_COLOR = "white",
       background_color_array = [['#FF837B', '#FFB29A', '#A14848'], ['#7C90F9', '#ACC3FF', '#545895'],
@@ -26,11 +26,11 @@ const BLOCK_SIZE = 55,
       BACKGROUND_COLOR = background_color_array[Math.floor(Math.random() * background_color_array.length)],
       BLOCK_COLOR = BACKGROUND_COLOR[2];
 
-let game_array = [], // フィールドの二次元配列
+let game_array = [], // フィールド�?�二次�?配�??
     game_array_element = [],
-    num_position_array = [], // 数字の位置の二次元配列
-    time = 0, // 全体のタイマー
-    rod_start_position = [], //邪魔する棒を出すときの位置を格納する
+    num_position_array = [], // 数字�?�位置の二次�?配�??
+    time = 0, // 全体�?�タイマ�?�
+    rod_start_position = [], //邪魔する棒を出すとき�?�位置を�?�納す�?
     before_rod_event_time = 0, // 前回棒を出した時刻
     before_bullet_event_time = 0,
     can_num_write = true,
@@ -40,7 +40,7 @@ let game_array = [], // フィールドの二次元配列
     is_submitted = false,
     is_finished = false;
 
-//よく使う関数を定義
+//よく使�?関数を定義
 const randRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 const createSnakeInfo = () => {
   let handle = direction_array[Math.floor(Math.random()*4)];
@@ -66,7 +66,7 @@ const createSnakeInfo = () => {
   return [handle, speed_array[0], speed_array[1]];
 }
 
-//外周がnull,内側が0の二次元配列をgame_arrayに格納する
+//外周がnull,�?側�?0の二次�?配�?�をgame_arrayに格納す�?
 for (let i=0; i<GRID_NUM_Y; i++) {
   game_array_element = [];
   for (let j=0; j<GRID_NUM_X; j++) {
@@ -117,7 +117,7 @@ phina.define('LoadingScene', {
     // ラベル
     var label = Label({
       text: "NOW LOADING...",
-      fontFamily: "'Orbitron', 'MS ゴシック'",
+      fontFamily: "'Orbitron', 'MS ゴシ�?ク'",
       fill: "white",
     })
     .addChildTo(baseLayer)
@@ -128,7 +128,7 @@ phina.define('LoadingScene', {
     .to({alpha:1}, 500)
     ;
     
-    // くるくるまわる円
+    // くるくるまわる�?
     var circle = phina.display.CircleShape({
       stroke: "white",
       fill: false,
@@ -156,16 +156,16 @@ phina.define('LoadingScene', {
     // フロー
     var flows = [];
 
-    // ローダー処理
+    // ローダー処�?
     var loader = phina.asset.AssetLoader();
     var loaderFlow = phina.util.Flow(function(resolve) {
 
-      // 進行
+      // 進�?
       loader.onprogress = function(e) {
        gauge.value = e.progress * 80;
       };
 
-      // ロード完了
+      // ロード完�?
       loader.onload = function() {
         resolve("loader loaded!");
       };
@@ -173,7 +173,7 @@ phina.define('LoadingScene', {
     flows.push(loaderFlow);
     loader.load(options.assets);
 
-    // 時間稼ぎ用の仮処理
+    // 時間稼ぎ用の仮処�?
     var otherFlow = phina.util.Flow(function(resolve) {
       setTimeout(function() {
         resolve("owari!");
@@ -185,7 +185,7 @@ phina.define('LoadingScene', {
     phina.util.Flow.all(flows).then(function(args) {
 
       SoundManager.play('finishLoad');
-      //ゲージ即座に100％に
+      //ゲージ即座に100?�?に
       gauge.animationTime = 1;
       gauge.value = 100;
 
@@ -220,11 +220,11 @@ phina.define('LoadingScene', {
 
 phina.define('MainScene', {
   superClass: 'DisplayScene',
-  //初期化処理
+  //初期化�?��?
   init: function(options) {
     this.superInit(options);
     this.backgroundColor = BACKGROUND_COLOR[1];
-    //X方向、Y方向のGridをスクリーン幅に応じて作成
+    //X方向、Y方向�?�Gridをスクリーン�?に応じて作�??
     const blockGridX = Grid({
       width: SCREEN_WIDTH,
       columns: GRID_NUM_X,
@@ -235,7 +235,7 @@ phina.define('MainScene', {
       columns: GRID_NUM_Y,
       offset: GRID_SIZE/2
     });
-    //ブロックを配置する。周りに赤のブロックを置く
+    //ブロ�?クを�?�置する。周りに赤のブロ�?クを置�?
     const blockGroup = DisplayElement().addChildTo(this),
           bulletGroup = DisplayElement().addChildTo(this);
     let numGroup = DisplayElement().addChildTo(this);
@@ -261,7 +261,7 @@ phina.define('MainScene', {
       text: 0,
       fontSize: 30,
       fill: "white",
-      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
+      fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'"
     }).addChildTo(this).setPosition(blockGridX.span(1), 70);
     this.scoreLabel = scoreLabel;
 
@@ -287,16 +287,16 @@ phina.define('MainScene', {
       text: 30,
       fontSize: 40,
       fill: "white",
-      fontFamily: "'Orbitron', 'ＭＳ ゴシック'"
+      fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'"
     }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X-3), 90);
     this.bulletLabel = bulletLabel;
 
-    //ユーザー（snake）を作成
+    //ユーザー?�?snake?��を作�??
     let [handle, speedX, speedY] = createSnakeInfo();
     const snake = Snake(handle, speedX, speedY).addChildTo(this);
     snake.setPosition(blockGridX.span(snake.livePosition[0]), blockGridY.span(snake.livePosition[1]));
 
-    //他の関数からでも参照できるようにする
+    //他�?�関数からでも参照できるようにする
     this.snake = snake;
     this.blockGroup = blockGroup;
     this.bulletGroup = bulletGroup;
@@ -304,14 +304,14 @@ phina.define('MainScene', {
     this.blockGridX = blockGridX;
     this.blockGridY = blockGridY;
 
-    //数字を作成
+    //数字を作�??
     this.makeNum(NUM_STRICT);
     const self = this;
     setTimeout(function() {
       self.makeBulletItem();
     }, 10000);
 
-    //点数２倍アイテムを作成
+    //点数?��倍アイ�?�?を作�??
     setTimeout(function() {
       self.makePointTwiceItem();
     }, 20000);
@@ -320,16 +320,16 @@ phina.define('MainScene', {
       self.makeBulletFourItem();
     }, 15000);
 
-    //銃弾のタイマー
+    //�?弾のタイマ�?�
     this.bulletTimer = 0; 
   },
-  //毎フレーム実行する処理
+  //毎フレー�?実行する�?��?
   update: function(app) {
     const snake = this.snake;
     const key = app.keyboard;
     const self = this;
     time += app.deltaTime;
-    // ポイント２倍期間が過ぎるとそれを止め、一定時間後にまた出す
+    // ポイント２倍期間が過ぎるとそれを止め、一定時間後にまた�?��?
     if (time-point_twice_start_time > POINT_TWICE_TIME && snake.isPointTwice) {
       snake.fill = "white";
       snake.isPointTwice = false;
@@ -406,9 +406,9 @@ phina.define('MainScene', {
     }
     snake.moveBy(snake.speed[0], snake.speed[1]);
     this.blockGroup.children.some(function(block) {
-      //snakeとblockが重なった場合の処理
+      //snakeとblockが重なった�?�合�?�処�?
       if (snake.x == block.x && snake.y == block.y) {
-        //前のブロックから進んだ方向をbeforedirectionで取得し、位置に反映させる
+        //前�?�ブロ�?クから進んだ方向をbeforedirectionで取得し、位置に反映させ�?
         switch (snake.beforedirection) {
           case 'right':
             snake.livePosition[0] += 1;
@@ -482,10 +482,10 @@ phina.define('MainScene', {
           if (game_array[snake.livePosition[1]][snake.livePosition[0]] !== 0) {
             if (snake.isPointTwice) {
               let pointTwiceLabel = Label({
-                text: "×2",
+                text: "�?2",
                 fill: "white",
                 fontSize: (BLOCK_SIZE-30)/4*3,
-                fontFamily: "'Orbitron', 'MS ゴシック",
+                fontFamily: "'Orbitron', 'MS ゴシ�?ク",
               }).addChildTo(self).setPosition(snake.x+SNAKE_SIZE, snake.y-SNAKE_SIZE);
               setTimeout(function() {
                 pointTwiceLabel.remove();
@@ -521,7 +521,7 @@ phina.define('MainScene', {
             }
           });
         }
-        //次に進む方向による処理,snake自体のスピードを変える
+        //次に進む方向による処�?,snake自体�?�スピ�?�ドを変え�?
         switch (snake.afterdirection) {
           case 'right':
             snake.speed[0] = SNAKE_SPEED;
@@ -547,13 +547,13 @@ phina.define('MainScene', {
         }
       } 
     )
-    //ここは毎フレーム行う。押された十字キーがbeforedirectionと反対でないならafterdirectionを更新
+    //ここは毎フレー�?行う。押された十字キーがbeforedirectionと反対でな�?ならafterdirectionを更新
     for (i=0; i<4; i++) {
       if (key.getKey(direction_array[i]) && snake.beforedirection !== direction_array[(i+2)%4]) {
         snake.afterdirection = direction_array[i];
       }
     }
-    //ここから銃弾の処理
+    //ここから�?弾の処�?
     this.bulletTimer += app.deltaTime;
     if (key.getKey('space') && snake.bullets > 0 && this.bulletTimer > 500 && !snake.isDead) {
       if (snake.isBulletFour) {
@@ -610,11 +610,11 @@ phina.define('MainScene', {
     if (!is_finished) {
       is_finished = true;
       $("body").append("<div id='black-cover'></div>").hide().fadeIn(500);
-      $("#black-cover").append("<h1>GAME OVER</h1>").hide().fadeIn(1000);
+      $("#black-cover").append("<h1>Your Score was " + String(this.snake.score) + "</h1>").hide().fadeIn(1000);
     }
     const self = this;
     setTimeout(function() {
-      // 少し待ってからタイトル画面へ
+      // 少し�?ってからタイトル画面へ
       if (!is_submitted) {
         $("#hidden_form").append($("<input />", {
           type: 'hidden',
@@ -626,7 +626,7 @@ phina.define('MainScene', {
       }
     }, 2000);
   },
-  // 被らない場所に数字を出す
+  // 被らな�?場所に数字を出�?
   makeNum: function(count) {
     for (i=0; i<count; i++) {
       let [numPositionX, numPositionY] = [randRange(1, GRID_NUM_X-2), randRange(2, GRID_NUM_Y-2)];
@@ -650,13 +650,13 @@ phina.define('MainScene', {
       let label = Label({
         text: num,
         fontSize: BLOCK_SIZE-30,
-        fontFamily: "'Orbitron', 'ＭＳ ゴシック'",
+        fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'",
         fill: "white"
       }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
       label.num_position_array = [numPositionX, numPositionY];
       }
   },
-  // 棒を出す前に両端で点滅させる
+  // 棒を出す前に両端で点�?させ�?
   flash: function(object) {
     object.tweener.clear()
                   .call(function() {
@@ -686,7 +686,7 @@ phina.define('MainScene', {
                     object.remove();
                   });
   },
-  //ユーザをアニメーションと共に殺す
+  //ユーザをアニメーションと共に殺�?
   killSnake: function(snake) {
     snake.tweener.clear()
                        .scaleTo(0.1, 50)
@@ -771,8 +771,8 @@ phina.define('Snake', {
       fill: MY_COLOR,
       strokeWidth: 0
     });
-    this.beforedirection = handle; //今進んでいる方向
-    this.afterdirection = handle; //次ブロックと重なった時に進む方向
+    this.beforedirection = handle; //今進んで�?る方�?
+    this.afterdirection = handle; //次ブロ�?クと重なった時に進む方�?
     this.speed = [speedX, speedY];
     this.livePosition = [randRange(GRID_NUM_X/4, GRID_NUM_X/4*3), randRange(GRID_NUM_Y/4, GRID_NUM_Y/4*3)];
     this.bullets = 30;
