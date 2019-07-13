@@ -8,6 +8,7 @@ const BLOCK_SIZE = 55,
     GRID_NUM_Y = SCREEN_HEIGHT / GRID_SIZE,
     SNAKE_SPEED = 6,
     SNAKE_SIZE = 20,
+    BULLET_NUM = 15,
     BULLET_SPEED = 10,
     BULLET_SIZE = 10,
     NUM_EVENT_RANGE = 2000, // 数字を出すイベント�?�間隔
@@ -284,7 +285,7 @@ phina.define('MainScene', {
 
         //弾数表示
         let bulletLabel = Label({
-            text: 30,
+            text: BULLET_NUM,
             fontSize: 40,
             fill: "white",
             fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'"
@@ -775,7 +776,7 @@ phina.define('Snake', {
         this.afterdirection = handle; //次ブロ�?クと重なった時に進む方�?
         this.speed = [speedX, speedY];
         this.livePosition = [randRange(GRID_NUM_X / 4, GRID_NUM_X / 4 * 3), randRange(GRID_NUM_Y / 4, GRID_NUM_Y / 4 * 3)];
-        this.bullets = 30;
+        this.bullets = BULLET_NUM;
         this.score = 0;
         this.isDead = false;
         this.isPointTwice = false;
