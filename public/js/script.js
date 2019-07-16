@@ -1,16 +1,17 @@
 phina.globalize();
-
-const BLOCK_SIZE = 55,
-    SCREEN_WIDTH = 1740,
-    SCREEN_HEIGHT = 960,
-    GRID_SIZE = 60,
+console.log(window.innerWidth);
+console.log(window.innerHeight)
+const SCREEN_WIDTH = 1280,
+    SCREEN_HEIGHT = 680,
+    GRID_SIZE = 40,
     GRID_NUM_X = SCREEN_WIDTH / GRID_SIZE,
     GRID_NUM_Y = SCREEN_HEIGHT / GRID_SIZE,
-    SNAKE_SPEED = 6,
-    SNAKE_SIZE = 20,
+    BLOCK_SIZE = GRID_SIZE * 0.9,
+    SNAKE_SPEED = GRID_SIZE / 10,
+    SNAKE_SIZE = GRID_SIZE / 3,
     BULLET_NUM = 15,
-    BULLET_SPEED = 10,
-    BULLET_SIZE = 10,
+    BULLET_SPEED = GRID_SIZE / 6,
+    BULLET_SIZE = GRID_SIZE / 6,
     NUM_EVENT_RANGE = 2000, // 数字を出すイベント�?�間隔
     ROD_EVENT_RANGE = 5000, // 棒を出すイベント�?�間隔
     BULLET_EVENT_RANGE = 30000, //�?弾補�??アイ�?�?を�?�すイベント�?�間隔
@@ -260,10 +261,10 @@ phina.define('MainScene', {
         //点数表示
         let scoreLabel = Label({
             text: 0,
-            fontSize: 30,
+            fontSize: GRID_SIZE / 2,
             fill: "white",
             fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'"
-        }).addChildTo(this).setPosition(blockGridX.span(1), 70);
+        }).addChildTo(this).setPosition(blockGridX.span(1), SCREEN_HEIGHT / 14);
         this.scoreLabel = scoreLabel;
 
         let scoreBar = RectangleShape({
@@ -272,24 +273,24 @@ phina.define('MainScene', {
             strokeWidth: 0,
             fill: "white",
             radius: 100
-        }).addChildTo(this).setPosition(53, 100);
+        }).addChildTo(this).setPosition(SCREEN_WIDTH / 33, SCREEN_HEIGHT / 9.6);
         scoreBar.setOrigin(0, 0.5);
         this.scoreBar = scoreBar;
 
         Label({
             text: '残弾数',
-            fontSize: 18,
+            fontSize: GRID_SIZE * 0.3,
             fontFamily: "Yuanti TC",
             fill: "white"
-        }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X - 3), 50);
+        }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X - 3), GRID_SIZE * 5 / 6);
 
         //弾数表示
         let bulletLabel = Label({
             text: BULLET_NUM,
-            fontSize: 40,
+            fontSize: GRID_SIZE * 2 / 3,
             fill: "white",
             fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'"
-        }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X - 3), 90);
+        }).addChildTo(this).setPosition(blockGridX.span(GRID_NUM_X - 3), GRID_SIZE * 1.5);
         this.bulletLabel = bulletLabel;
 
         //ユーザー?�?snake?��を作�??
@@ -650,7 +651,7 @@ phina.define('MainScene', {
             game_array[numPositionY][numPositionX] = num;
             let label = Label({
                 text: num,
-                fontSize: BLOCK_SIZE - 30,
+                fontSize: BLOCK_SIZE / 2,
                 fontFamily: "'Orbitron', '?��?�� ゴシ�?ク'",
                 fill: "white"
             }).addChildTo(this.numGroup).setPosition(this.blockGridX.span(numPositionX), this.blockGridY.span(numPositionY));
@@ -706,7 +707,8 @@ phina.define('MainScene', {
             }
         }
         let bulletItem = Sprite('bulletItem').addChildTo(this)
-            .setPosition(this.blockGridX.span(bulletItemPosition[0]), this.blockGridY.span(bulletItemPosition[1]));
+            .setPosition(this.blockGridX.span(bulletItemPosition[0]), this.blockGridY.span(bulletItemPosition[1]))
+            .setScale(GRID_SIZE / 60, GRID_SIZE / 60);
         game_array[bulletItemPosition[1]][bulletItemPosition[0]] = 100;
         this.bulletItem = bulletItem;
     },
@@ -720,7 +722,8 @@ phina.define('MainScene', {
             }
         }
         let pointTwiceItem = Sprite('pointTwiceItem').addChildTo(this)
-            .setPosition(this.blockGridX.span(pointTwiceItemPosition[0]), this.blockGridY.span(pointTwiceItemPosition[1]));
+            .setPosition(this.blockGridX.span(pointTwiceItemPosition[0]), this.blockGridY.span(pointTwiceItemPosition[1]))
+            .setScale(GRID_SIZE / 60, GRID_SIZE / 60);
         game_array[pointTwiceItemPosition[1]][pointTwiceItemPosition[0]] = 200;
         this.pointTwiceItem = pointTwiceItem;
     },
@@ -733,7 +736,9 @@ phina.define('MainScene', {
                 bulletFlag = false;
             }
         }
-        let bulletFourItem = Sprite('bulletFourItem').addChildTo(this).setPosition(this.blockGridX.span(bulletFourItemPosition[0]), this.blockGridY.span(bulletFourItemPosition[1]));
+        let bulletFourItem = Sprite('bulletFourItem').addChildTo(this)
+            .setPosition(this.blockGridX.span(bulletFourItemPosition[0]), this.blockGridY.span(bulletFourItemPosition[1]))
+            .setScale(GRID_SIZE / 60, GRID_SIZE / 60);
         game_array[bulletFourItemPosition[1]][bulletFourItemPosition[0]] = 300;
         this.bulletFourItem = bulletFourItem;
     }
@@ -801,8 +806,8 @@ phina.define('Bullet', {
 phina.main(function () {
     GameApp({
         startLabel: 'main',
-        width: 1760,
-        height: SCREEN_HEIGHT,
+        width: window.innerWidth,
+        height: window.innerHeight,
         assets: ASSETS
     }).run();
 });
