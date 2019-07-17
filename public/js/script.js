@@ -618,13 +618,7 @@ phina.define('MainScene', {
         setTimeout(function () {
             // 少し�?ってからタイトル画面へ
             if (!is_submitted) {
-                $("#hidden_form").append($("<input />", {
-                    type: 'hidden',
-                    name: 'score',
-                    value: score
-                }));
-                $("#hidden_form").submit();
-                is_submitted = true;
+                location.href = "/";
             }
         }, 2000);
     },

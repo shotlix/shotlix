@@ -3,26 +3,24 @@ const app = express();
 const http = require('http').Server(app);
 const PORT = process.env.PORT || 8000;
 const helmet = require('helmet');
+const cons = require("consolidate");
+const path = require("path");
 
 app.use(helmet());
 app.use(express.static(__dirname + '/public'));
-app.use(require('body-parser').urlencoded({ extended: true }));
-app.set('view engine', 'pug');
 
-app.get('/', function(req, res, next){
-    res.render('index');
+app.engine("html", cons.swig);
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "html");
+
+app.get('/', function (req, res, next) {
+    res.render('index.html');
 });
 
-app.post('/ranking', function(req, res, next) {
-    res.redirect('/');
-});
+app.get("/game", function (req, res, next) {
+    res.render("game.html");
+})
 
-app.post('/game', function(req, res, next) {
-    res.render('game', {
-        name: req.body.name,
-    });
-});
-
-http.listen(PORT, function(){
+http.listen(PORT, function () {
     console.log('Server listening. Port:' + PORT);
 });
