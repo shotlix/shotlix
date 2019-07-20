@@ -108,14 +108,14 @@ phina.define('LoadingScene', {
 
   init: function(options) {
     this.superInit(options);
-    var self = this;
+    let self = this;
     this.backgroundColor = BACKGROUND_COLOR[1];
 
     // view
-    var baseLayer = DisplayElement(options).addChildTo(this);
+    let baseLayer = DisplayElement(options).addChildTo(this);
 
     // ラベル
-    var label = Label({
+    let label = Label({
       text: "NOW LOADING...",
       fontFamily: "'Orbitron', 'MS ゴシック'",
       fill: "white",
@@ -129,7 +129,7 @@ phina.define('LoadingScene', {
     ;
     
     // くるくるまわる円
-    var circle = phina.display.CircleShape({
+    let circle = phina.display.CircleShape({
       stroke: "white",
       fill: false,
       radius: 100,
@@ -143,7 +143,7 @@ phina.define('LoadingScene', {
     .to({scaleX: 1}, 900, "easeInOutCubic");
     
     // ゲージ
-    var gauge = phina.ui.Gauge({
+    let gauge = phina.ui.Gauge({
       value: 0,
       gaugeColor: BACKGROUND_COLOR[2],
       strokeWidth: 0,
@@ -154,11 +154,11 @@ phina.define('LoadingScene', {
 
 
     // フロー
-    var flows = [];
+    let flows = [];
 
     // ローダー処理
-    var loader = phina.asset.AssetLoader();
-    var loaderFlow = phina.util.Flow(function(resolve) {
+    let loader = phina.asset.AssetLoader();
+    let loaderFlow = phina.util.Flow(function(resolve) {
 
       // 進行
       loader.onprogress = function(e) {
@@ -174,7 +174,7 @@ phina.define('LoadingScene', {
     loader.load(options.assets);
 
     // 時間稼ぎ用の仮処理
-    var otherFlow = phina.util.Flow(function(resolve) {
+    let otherFlow = phina.util.Flow(function(resolve) {
       setTimeout(function() {
         resolve("owari!");
       }, 3000)
